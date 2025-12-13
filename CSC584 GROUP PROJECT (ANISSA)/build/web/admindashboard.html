@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Mentorship Management</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --info: #17a2b8;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar - FIXED TO 250px (Matching Reports Page) */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary);
+            color: white;
+            padding: 25px 0;
+            box-shadow: var(--shadow);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo-area h1 {
+            font-size: 1.5rem;
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .logo-icon {
+            background-color: var(--secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 5px;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .nav-links i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--accent);
+        }
+
+        .logout-btn i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .user-info {
+            position: absolute;
+            bottom: 80px;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 12px;
+        }
+
+        .user-details h4 {
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+        }
+
+        .user-details p {
+            font-size: 0.8rem;
+            color: #bbb;
+        }
+
+        /* Main Content - Updated margin-left to 250px */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 30px;
+            max-width: calc(100vw - 250px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        /* Notification Popup Styles */
+        .notifications-popup {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 400px;
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notifications-popup-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notifications-popup-header h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .notifications-popup-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            align-items: flex-start;
+            transition: background-color 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .notification-item.unread {
+            background-color: #f0f7ff;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .notification-icon.success {
+            background-color: #e7f7ef;
+            color: var(--success);
+        }
+
+        .notification-icon.warning {
+            background-color: #fef9e7;
+            color: #f39c12;
+        }
+
+        .notification-icon.info {
+            background-color: #e8f4fd;
+            color: var(--secondary);
+        }
+
+        .notification-icon.error {
+            background-color: #fdedec;
+            color: var(--accent);
+        }
+
+        .notification-details h4 {
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .notification-details p {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .notifications-popup-footer {
+            padding: 15px 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+
+        .mark-all-read {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .mark-all-read:hover {
+            text-decoration: underline;
+        }
+        
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+
+        /* Notification dropdown arrow */
+        .notifications-popup::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid white;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .card-icon.users {
+            background-color: var(--secondary);
+        }
+
+        .card-icon.applications {
+            background-color: var(--warning);
+        }
+
+        .card-icon.programs {
+            background-color: var(--info);
+        }
+
+        .card-icon.reports {
+            background-color: var(--success);
+        }
+
+        .card h3 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .card-footer {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .card-footer i {
+            font-size: 0.8rem;
+        }
+
+        .card-footer.increase {
+            color: var(--success);
+        }
+
+        .card-footer.decrease {
+            color: var(--accent);
+        }
+
+        /* Sections */
+        .sections-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .sections-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .section {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            min-height: 450px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .section-header h3 {
+            color: var(--primary);
+            font-size: 1.4rem;
+        }
+
+        .btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+        }
+
+        .btn-danger {
+            background-color: var(--accent);
+        }
+
+        .btn-info {
+            background-color: var(--info);
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            flex-grow: 1;
+        }
+
+        thead {
+            background-color: #f8f9fa;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 1px solid #eee;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status.pending {
+            background-color: #fef9e7;
+            color: var(--warning);
+        }
+
+        .status.approved {
+            background-color: #e7f7ef;
+            color: var(--success);
+        }
+
+        .status.rejected {
+            background-color: #fdedec;
+            color: var(--accent);
+        }
+
+        .status.active {
+            background-color: #e7f7ef;
+            color: var(--success);
+        }
+
+        .status.inactive {
+            background-color: #f5f5f5;
+            color: #777;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            flex-grow: 1;
+            min-height: 250px;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .chart-wrapper {
+            width: 100%;
+            height: 200px;
+            position: relative;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--secondary);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        /* Chart Controls */
+        .chart-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .chart-control-btn {
+            padding: 8px 16px;
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .chart-control-btn:hover {
+            background-color: #e8f4fd;
+        }
+
+        .chart-control-btn.active {
+            background-color: var(--secondary);
+            color: white;
+            border-color: var(--secondary);
+        }
+
+        /* Popup Notification */
+        .popup-notification {
+            position: fixed;
+            top: 100px;
+            right: 30px;
+            width: 350px;
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 2000;
+            animation: slideInRight 0.3s ease;
+            overflow: hidden;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .popup-notification-header {
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        .popup-notification-header h4 {
+            color: var(--primary);
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .popup-notification-body {
+            padding: 20px;
+        }
+
+        .popup-notification-body p {
+            font-size: 0.9rem;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .popup-notification-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Logout Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .logout-modal {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--shadow);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .logout-modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ffeaea;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .modal-header h3 {
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .modal-body {
+            margin-bottom: 25px;
+        }
+
+        .modal-body p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.cancel {
+            background-color: #ecf0f1;
+            color: #333;
+        }
+
+        .modal-btn.cancel:hover {
+            background-color: #d5dbdb;
+        }
+
+        .modal-btn.logout {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .modal-btn.logout:hover {
+            background-color: #c0392b;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
+        }
+
+        /* Stats Grid in Chart Section */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: var(--radius);
+        }
+
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+                padding-top: 25px;
+            }
+
+            .logo-area h1, .user-details, .nav-links a span, .logout-btn span {
+                display: none;
+            }
+
+            .logo-area {
+                justify-content: center;
+                padding: 0 0 25px;
+            }
+
+            .logo-icon {
+                margin: 0;
+            }
+
+            .nav-links a {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .nav-links i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+
+            .logout-btn {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .logout-btn i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+
+            .user-profile {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .user-avatar {
+                margin-right: 0;
+            }
+
+            .main-content {
+                margin-left: 70px;
+                max-width: calc(100vw - 70px);
+                padding: 20px;
+            }
+
+            .dashboard-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .sections-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .notifications-popup {
+                width: 300px;
+                right: -50px;
+            }
+            
+            .notifications-popup::before {
+                right: 50px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .header h2 {
+                font-size: 1.4rem;
+            }
+
+            .main-content {
+                padding: 20px 15px;
+            }
+
+            .section {
+                padding: 20px 15px;
+                min-height: 400px;
+            }
+            
+            .popup-notification {
+                width: 90%;
+                right: 5%;
+            }
+            
+            .notifications-popup {
+                width: 280px;
+                right: -70px;
+            }
+            
+            .notifications-popup::before {
+                right: 70px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 15px 12px;
+            }
+
+            .section {
+                padding: 15px 12px;
+                min-height: 350px;
+            }
+
+            .chart-controls {
+                flex-wrap: wrap;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar - Now 250px (Same as Reports Page) -->
+        <div class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <h1>Admin Portal</h1>
+            </div>
+            
+            <ul class="nav-links">
+                <li>
+                    <a href="admindashboard.html" class="active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="usermanage.html">
+                        <i class="fas fa-users"></i>
+                        <span>User Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="progmanage.html">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Program Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="reports.html">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="user-info">
+                <div class="user-profile">
+                    <div class="user-avatar">AS</div>
+                    <div class="user-details">
+                        <h4>Anissa Syuhada</h4>
+                        <p>Administrator</p>
+                    </div>
+                </div>
+                
+                <button class="logout-btn" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content - Updated margin-left to 250px -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h2>Admin Dashboard</h2>
+                <div class="notifications" id="notifications">
+                    <i class="fas fa-bell fa-lg"></i>
+                    <span class="notification-badge">4</span>
+                    <div class="notifications-popup" id="notifications-popup">
+                        <div class="notifications-popup-header">
+                            <h3>Notifications</h3>
+                            <button class="modal-close-btn" onclick="closeNotifications()">&times;</button>
+                        </div>
+                        <div class="notifications-popup-content">
+                            <div class="notification-item unread">
+                                <div class="notification-icon warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>System Backup Required</h4>
+                                    <p>Weekly system backup is pending</p>
+                                    <span class="notification-time">2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="notification-icon info">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>New Mentor Applications</h4>
+                                    <p>3 new mentor applications pending review</p>
+                                    <span class="notification-time">1 day ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon success">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Monthly Report Ready</h4>
+                                    <p>February system report is available</p>
+                                    <span class="notification-time">2 days ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon error">
+                                    <i class="fas fa-server"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>High Server Load</h4>
+                                    <p>Server load at 85%, consider optimization</p>
+                                    <span class="notification-time">3 days ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="notifications-popup-footer">
+                            <button class="mark-all-read" onclick="markAllAsRead()">Mark all as read</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Dashboard Cards -->
+            <div class="dashboard-cards">
+                <div class="card" onclick="navigateTo('usermanage.html')">
+                    <div class="card-header">
+                        <div class="card-icon users">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h3 id="total-users-count">247</h3>
+                            <p>Total Users</p>
+                        </div>
+                    </div>
+                    <div class="card-footer increase">
+                        <i class="fas fa-arrow-up"></i> 12% from last month
+                    </div>
+                </div>
+                
+                <div class="card" onclick="showPendingApplications()">
+                    <div class="card-header">
+                        <div class="card-icon applications">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div>
+                            <h3 id="pending-applications-count">14</h3>
+                            <p>Pending Applications</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <i class="fas fa-clock"></i> Requires review
+                    </div>
+                </div>
+                
+                <div class="card" onclick="navigateTo('progmanage.html')">
+                    <div class="card-header">
+                        <div class="card-icon programs">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div>
+                            <h3 id="active-programs-count">8</h3>
+                            <p>Active Programs</p>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <i class="fas fa-check-circle"></i> All programs running
+                    </div>
+                </div>
+                
+                <div class="card" onclick="navigateTo('reports.html')">
+                    <div class="card-header">
+                        <div class="card-icon reports">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div>
+                            <h3 id="satisfaction-rate">94%</h3>
+                            <p>System Satisfaction</p>
+                        </div>
+                    </div>
+                    <div class="card-footer increase">
+                        <i class="fas fa-thumbs-up"></i> Excellent rating
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Main Sections -->
+            <div class="sections-container">
+                <!-- System Overview -->
+                <div class="section">
+                    <div class="section-header">
+                        <h3>System Overview</h3>
+                        <button class="btn btn-small" onclick="refreshSystemData()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="margin-bottom: 10px; font-size: 1rem;">System Health</h4>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="system-health-bar" style="width: 85%;"></div>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 8px;">
+                            <span style="font-size: 0.9rem;">Load: <span id="system-load" style="font-weight: 600;">85</span>%</span>
+                            <span style="font-size: 0.9rem;">Status: <span id="system-status" style="font-weight: 600; color: var(--warning);">Moderate</span></span>
+                        </div>
+                    </div>
+                    
+                    <div style="flex-grow: 1; margin-bottom: 20px;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Task Type</th>
+                                    <th>Count</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pending-tasks-body">
+                                <!-- Tasks will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- User Growth Chart -->
+                <div class="section">
+                    <div class="section-header">
+                        <h3>User Growth</h3>
+                        <div class="chart-controls">
+                            <button class="chart-control-btn active" onclick="changeChartPeriod('week')">7D</button>
+                            <button class="chart-control-btn" onclick="changeChartPeriod('month')">30D</button>
+                            <button class="chart-control-btn" onclick="changeChartPeriod('quarter')">90D</button>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-wrapper">
+                            <canvas id="userGrowthChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-value" style="color: var(--success);">+24</div>
+                            <div class="stat-label">New Users</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" style="color: var(--info);">+18%</div>
+                            <div class="stat-label">Growth Rate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" style="color: var(--secondary);">92%</div>
+                            <div class="stat-label">Retention</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="footer">
+                <p>Mentorship Management System &copy; 2023 | Admin Dashboard</p>
+                <p style="font-size: 0.8rem; margin-top: 8px;">Last updated: <span id="last-updated">March 10, 2024 14:30</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Logout Modal -->
+    <div class="modal-overlay" id="logout-modal">
+        <div class="logout-modal">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <h3>Confirm Logout</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to logout from the Mentorship Management System?</p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancel-logout-btn">Cancel</button>
+                <button class="modal-btn logout" id="confirm-logout-btn">Logout</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Dummy data for the dashboard
+        const dummyData = {
+            userGrowth: {
+                week: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    data: [45, 52, 48, 55, 60, 58, 65]
+                },
+                month: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    data: [180, 195, 210, 225]
+                },
+                quarter: {
+                    labels: ['Jan', 'Feb', 'Mar'],
+                    data: [620, 690, 750]
+                }
+            },
+            
+            pendingTasks: [
+                { type: 'Mentor Applications', count: 5, status: 'pending', action: 'reviewApplications' },
+                { type: 'Program Approvals', count: 3, status: 'pending', action: 'reviewPrograms' },
+                { type: 'Report Generation', count: 2, status: 'scheduled', action: 'generateReports' },
+                { type: 'User Support Tickets', count: 1, status: 'pending', action: 'reviewTickets' }
+            ],
+            
+            systemStats: {
+                systemLoad: 85,
+                satisfactionRate: 94
+            }
+        };
+
+        // Chart instance
+        let userGrowthChart = null;
+        let currentChartPeriod = 'week';
+
+        // Initialize dashboard
+        function initDashboard() {
+            updateDashboardStats();
+            setLastUpdated();
+            renderPendingTasks();
+            createUserGrowthChart();
+            updateSystemHealth();
+            initLogoutModal();
+            initPopupNotifications();
+        }
+
+        // Initialize logout modal functionality
+        function initLogoutModal() {
+            // Get elements
+            const logoutBtn = document.getElementById('logout-btn');
+            const cancelBtn = document.getElementById('cancel-logout-btn');
+            const confirmBtn = document.getElementById('confirm-logout-btn');
+            const logoutModal = document.getElementById('logout-modal');
+            
+            // Show modal when logout button is clicked
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    showLogoutModal();
+                });
+            }
+            
+            // Close modal when cancel button is clicked
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function() {
+                    closeLogoutModal();
+                });
+            }
+            
+            // Confirm logout when logout button is clicked
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', function() {
+                    confirmLogout();
+                });
+            }
+            
+            // Close modal when clicking outside
+            if (logoutModal) {
+                logoutModal.addEventListener('click', function(e) {
+                    if (e.target === logoutModal) {
+                        closeLogoutModal();
+                    }
+                });
+            }
+        }
+
+        // Initialize popup notifications functionality
+        function initPopupNotifications() {
+            // Show popup notification for urgent tasks on page load
+            setTimeout(() => {
+                if (dummyData.pendingTasks[0].count > 0) {
+                    showPopupNotification(
+                        'Pending Applications',
+                        `You have ${dummyData.pendingTasks[0].count} mentor applications awaiting review.`,
+                        'warning'
+                    );
+                }
+            }, 1500);
+            
+            // Simulate incoming notifications
+            setTimeout(() => {
+                showPopupNotification(
+                    'System Update',
+                    'System maintenance scheduled for tomorrow at 2:00 AM.',
+                    'info'
+                );
+            }, 8000);
+        }
+
+        // Show logout modal
+        function showLogoutModal() {
+            const modal = document.getElementById('logout-modal');
+            if (modal) {
+                modal.classList.add('active');
+            }
+        }
+
+        // Close logout modal
+        function closeLogoutModal() {
+            const modal = document.getElementById('logout-modal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        }
+
+        // Confirm logout
+        function confirmLogout() {
+            alert('You have been logged out successfully!');
+            closeLogoutModal();
+            // In a real app, you would redirect to login page:
+            // window.location.href = 'login.html';
+        }
+
+        // Update dashboard statistics
+        function updateDashboardStats() {
+            document.getElementById('total-users-count').textContent = '247';
+            document.getElementById('pending-applications-count').textContent = '14';
+            document.getElementById('active-programs-count').textContent = '8';
+            document.getElementById('satisfaction-rate').textContent = '94%';
+        }
+
+        // Set last updated time
+        function setLastUpdated() {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            };
+            document.getElementById('last-updated').textContent = now.toLocaleDateString('en-US', options);
+        }
+
+        // Render pending tasks
+        function renderPendingTasks() {
+            const tbody = document.getElementById('pending-tasks-body');
+            tbody.innerHTML = '';
+            
+            dummyData.pendingTasks.forEach(task => {
+                const row = document.createElement('tr');
+                
+                let statusClass = 'status pending';
+                let statusText = 'Pending';
+                
+                if (task.status === 'scheduled') {
+                    statusClass = 'status active';
+                    statusText = 'Scheduled';
+                }
+                
+                row.innerHTML = `
+                    <td>${task.type}</td>
+                    <td>${task.count}</td>
+                    <td><span class="${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="btn btn-small" onclick="handleTaskAction('${task.action}', '${task.type}')">
+                            ${task.status === 'pending' ? 'Review' : task.status === 'scheduled' ? 'Generate' : 'Review'}
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Handle task actions
+        function handleTaskAction(action, taskType) {
+            switch(action) {
+                case 'reviewApplications':
+                    reviewApplications(taskType);
+                    break;
+                case 'reviewPrograms':
+                    reviewPrograms(taskType);
+                    break;
+                case 'generateReports':
+                    generateReports(taskType);
+                    break;
+                case 'reviewTickets':
+                    reviewTickets(taskType);
+                    break;
+                default:
+                    alert(`Handling ${taskType}...`);
+            }
+        }
+
+        // Update system health indicator
+        function updateSystemHealth() {
+            const load = dummyData.systemStats.systemLoad;
+            const bar = document.getElementById('system-health-bar');
+            const loadSpan = document.getElementById('system-load');
+            const statusSpan = document.getElementById('system-status');
+            
+            loadSpan.textContent = load;
+            bar.style.width = load + '%';
+            
+            // Update color based on load
+            if (load < 60) {
+                bar.style.backgroundColor = 'var(--success)';
+                statusSpan.textContent = 'Good';
+                statusSpan.style.color = 'var(--success)';
+            } else if (load < 85) {
+                bar.style.backgroundColor = 'var(--warning)';
+                statusSpan.textContent = 'Moderate';
+                statusSpan.style.color = 'var(--warning)';
+            } else {
+                bar.style.backgroundColor = 'var(--accent)';
+                statusSpan.textContent = 'High';
+                statusSpan.style.color = 'var(--accent)';
+            }
+        }
+
+        // Create user growth chart
+        function createUserGrowthChart() {
+            const ctx = document.getElementById('userGrowthChart').getContext('2d');
+            const data = dummyData.userGrowth[currentChartPeriod];
+            
+            if (userGrowthChart) {
+                userGrowthChart.destroy();
+            }
+            
+            userGrowthChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'New Users',
+                        data: data.data,
+                        borderColor: 'var(--secondary)',
+                        backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                color: '#666'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                color: '#666'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Change chart period
+        function changeChartPeriod(period) {
+            currentChartPeriod = period;
+            
+            // Update button states
+            const buttons = document.querySelectorAll('.chart-controls .chart-control-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update chart
+            createUserGrowthChart();
+            
+            // Show notification about chart change
+            showPopupNotification(
+                'Chart Updated',
+                `User growth chart now showing ${period} data.`,
+                'info'
+            );
+        }
+
+        // Navigation functions
+        function navigateTo(page) {
+            alert(`Navigating to ${page}...`);
+        }
+
+        function showPendingApplications() {
+            alert('Showing all pending applications...');
+        }
+
+        function refreshSystemData() {
+            alert('Refreshing system data...');
+            
+            // Simulate data refresh
+            dummyData.systemStats.systemLoad = Math.floor(Math.random() * 20) + 70;
+            
+            updateDashboardStats();
+            updateSystemHealth();
+            setLastUpdated();
+            
+            showPopupNotification('System Data Refreshed', 'System data has been successfully updated.', 'success');
+        }
+
+        function reviewApplications(type) {
+            const count = dummyData.pendingTasks[0].count;
+            showPopupNotification(
+                'Reviewing Applications',
+                `Opening ${count} ${type} for review...`,
+                'info'
+            );
+            
+            // Simulate action completion
+            setTimeout(() => {
+                if (count > 0) {
+                    showPopupNotification(
+                        'Applications Reviewed',
+                        `Successfully processed ${count} ${type}.`,
+                        'success'
+                    );
+                    dummyData.pendingTasks[0].count = 0;
+                    renderPendingTasks();
+                    document.getElementById('pending-applications-count').textContent = '0';
+                }
+            }, 1500);
+        }
+
+        function reviewPrograms(type) {
+            const count = dummyData.pendingTasks[1].count;
+            showPopupNotification(
+                'Program Approval',
+                `Reviewing ${count} program approval requests...`,
+                'info'
+            );
+            
+            // Simulate action completion
+            setTimeout(() => {
+                if (count > 0) {
+                    showPopupNotification(
+                        'Programs Approved',
+                        `${count} programs have been approved successfully.`,
+                        'success'
+                    );
+                    dummyData.pendingTasks[1].count = 0;
+                    renderPendingTasks();
+                }
+            }, 1500);
+        }
+
+        function generateReports(type) {
+            showPopupNotification(
+                'Report Generation',
+                'Generating system reports...',
+                'info'
+            );
+            
+            // Simulate report generation
+            setTimeout(() => {
+                showPopupNotification(
+                    'Reports Ready',
+                    'System reports have been generated and are ready for download.',
+                    'success'
+                );
+                dummyData.pendingTasks[2].count = 0;
+                dummyData.pendingTasks[2].status = 'completed';
+                renderPendingTasks();
+            }, 2000);
+        }
+
+        function reviewTickets(type) {
+            const count = dummyData.pendingTasks[3].count;
+            showPopupNotification(
+                'Support Tickets',
+                `Reviewing ${count} user support tickets...`,
+                'info'
+            );
+            
+            // Simulate action completion
+            setTimeout(() => {
+                if (count > 0) {
+                    showPopupNotification(
+                        'Tickets Resolved',
+                        `${count} support tickets have been resolved.`,
+                        'success'
+                    );
+                    dummyData.pendingTasks[3].count = 0;
+                    renderPendingTasks();
+                }
+            }, 1500);
+        }
+
+        // Show popup notification
+        function showPopupNotification(title, message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'popup-notification';
+            
+            // Set icon and color based on type
+            let icon = 'info-circle';
+            let iconColor = 'var(--info)';
+            
+            switch(type) {
+                case 'success':
+                    icon = 'check-circle';
+                    iconColor = 'var(--success)';
+                    break;
+                case 'warning':
+                    icon = 'exclamation-triangle';
+                    iconColor = 'var(--warning)';
+                    break;
+                case 'error':
+                    icon = 'times-circle';
+                    iconColor = 'var(--accent)';
+                    break;
+            }
+            
+            notification.innerHTML = `
+                <div class="popup-notification-header">
+                    <h4>
+                        <i class="fas fa-${icon}" style="color: ${iconColor}"></i>
+                        ${title}
+                    </h4>
+                    <button class="modal-close-btn" onclick="this.parentElement.parentElement.remove()">&times;</button>
+                </div>
+                <div class="popup-notification-body">
+                    <p>${message}</p>
+                </div>
+                <div class="popup-notification-footer">
+                    <button class="btn btn-small" onclick="this.parentElement.parentElement.remove()">Dismiss</button>
+                </div>
+            `;
+            
+            // Add to document
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 8 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.opacity = '0';
+                    notification.style.transition = 'opacity 0.5s ease';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 500);
+                }
+            }, 8000);
+        }
+
+        // Notifications functionality
+        document.getElementById('notifications').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const popup = document.getElementById('notifications-popup');
+            popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+        });
+
+        function closeNotifications() {
+            document.getElementById('notifications-popup').style.display = 'none';
+        }
+
+        function markAllAsRead() {
+            const unreadItems = document.querySelectorAll('.notification-item.unread');
+            unreadItems.forEach(item => {
+                item.classList.remove('unread');
+            });
+            document.querySelector('.notification-badge').textContent = '0';
+            closeNotifications();
+            
+            // Show confirmation popup
+            showPopupNotification(
+                'Notifications Cleared',
+                'All notifications have been marked as read.',
+                'success'
+            );
+        }
+
+        // Close notifications when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#notifications-popup') && !e.target.closest('#notifications')) {
+                closeNotifications();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeLogoutModal();
+                
+                // Also close any open popup notifications
+                const popups = document.querySelectorAll('.popup-notification');
+                popups.forEach(popup => {
+                    popup.remove();
+                });
+            }
+        });
+
+        // Initialize the dashboard when page loads
+        document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+</body>
+</html>

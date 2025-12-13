@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Mentorship Management System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --info: #17a2b8;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+            --mentor-color: #3498db;
+            --student-color: #27ae60;
+            --admin-color: #9b59b6;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 500px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-card {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #eaeaea;
+        }
+
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to right, var(--mentor-color), var(--student-color), var(--admin-color));
+        }
+
+        .logo-area {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logo-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--mentor-color), var(--student-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            color: white;
+            font-size: 1.8rem;
+            box-shadow: var(--shadow);
+        }
+
+        .logo-area h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .logo-area p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Role Selection */
+        .role-selection {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .role-option {
+            padding: 20px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--radius);
+            background-color: #f9f9f9;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .role-option:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: var(--secondary);
+        }
+
+        .role-option.selected {
+            border-color: var(--secondary);
+            background-color: #e8f4fd;
+        }
+
+        .role-option.mentor.selected {
+            border-color: var(--mentor-color);
+            background-color: rgba(52, 152, 219, 0.08);
+        }
+
+        .role-option.student.selected {
+            border-color: var(--student-color);
+            background-color: rgba(39, 174, 96, 0.08);
+        }
+
+        .role-option.admin.selected {
+            border-color: var(--admin-color);
+            background-color: rgba(155, 89, 182, 0.08);
+        }
+
+        .role-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            background-color: var(--secondary);
+        }
+
+        .mentor .role-icon {
+            background-color: var(--mentor-color);
+        }
+
+        .student .role-icon {
+            background-color: var(--student-color);
+        }
+
+        .admin .role-icon {
+            background-color: var(--admin-color);
+        }
+
+        .role-name {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .role-description {
+            font-size: 0.8rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* Login Form */
+        .login-form {
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        .login-form.active {
+            display: block;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 0.95rem;
+        }
+
+        .input-with-icon {
+            position: relative;
+        }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            font-size: 1.1rem;
+            z-index: 1;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #f9f9f9;
+            color: #333;
+            position: relative;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background-color: white;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-control.error {
+            border-color: var(--accent);
+        }
+
+        .form-control.success {
+            border-color: var(--success);
+        }
+
+        .error-message {
+            color: var(--accent);
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+            animation: shake 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #777;
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 5px;
+            z-index: 2;
+        }
+
+        .password-toggle:hover {
+            color: var(--secondary);
+        }
+
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+
+        .remember-me input {
+            margin-right: 8px;
+            accent-color: var(--secondary);
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .remember-me label {
+            color: #555;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            color: var(--secondary);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.mentor {
+            background-color: var(--mentor-color);
+        }
+
+        .btn.mentor:hover {
+            background-color: #2980b9;
+        }
+
+        .btn.student {
+            background-color: var(--student-color);
+        }
+
+        .btn.student:hover {
+            background-color: #219653;
+        }
+
+        .btn.admin {
+            background-color: var(--admin-color);
+        }
+
+        .btn.admin:hover {
+            background-color: #8e44ad;
+        }
+
+        .btn i {
+            font-size: 1.1rem;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background-color: #eee;
+        }
+
+        .divider span {
+            padding: 0 15px;
+        }
+
+        .social-login {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .social-btn {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: var(--radius);
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .social-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+            border-color: var(--secondary);
+        }
+
+        .social-btn.google:hover {
+            border-color: #db4437;
+            color: #db4437;
+        }
+
+        .social-btn.microsoft:hover {
+            border-color: #00a4ef;
+            color: #00a4ef;
+        }
+
+        .social-btn i {
+            font-size: 1.2rem;
+        }
+
+        .register-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+            font-size: 0.95rem;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .register-link a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #777;
+            font-size: 0.85rem;
+        }
+
+        .login-footer a {
+            color: var(--secondary);
+            text-decoration: none;
+            margin: 0 5px;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Loading animation */
+        .btn.loading {
+            position: relative;
+            color: transparent;
+            pointer-events: none;
+        }
+
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success message */
+        .success-message {
+            background-color: #e7f7ef;
+            color: var(--success);
+            padding: 15px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            border-left: 4px solid var(--success);
+        }
+
+        .success-message.show {
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Demo credentials hint */
+        .demo-hint {
+            background-color: #fef9e7;
+            color: #856404;
+            padding: 12px 15px;
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            display: none;
+            border-left: 4px solid #f39c12;
+        }
+
+        .demo-hint.show {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .demo-hint code {
+            background-color: rgba(0, 0, 0, 0.05);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 576px) {
+            .login-card {
+                padding: 30px 25px;
+            }
+
+            .role-selection {
+                grid-template-columns: 1fr;
+            }
+
+            .social-login {
+                grid-template-columns: 1fr;
+            }
+
+            .remember-forgot {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .logo-area h1 {
+                font-size: 1.5rem;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .login-card {
+                padding: 25px 20px;
+            }
+
+            .logo-area h1 {
+                font-size: 1.3rem;
+            }
+            
+            .logo-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <!-- Success Message -->
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i>
+                <span id="successText">Login successful! Redirecting to dashboard...</span>
+            </div>
+
+            <!-- Demo Credentials Hint -->
+            <div class="demo-hint" id="demoHint">
+                <i class="fas fa-info-circle"></i>
+                <span id="demoText"></span>
+            </div>
+
+            <!-- Logo and Title -->
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <h1>Mentorship Portal</h1>
+                <p>Select your role to continue</p>
+            </div>
+
+            <!-- Role Selection -->
+            <div class="role-selection">
+                <div class="role-option mentor" data-role="mentor">
+                    <div class="role-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="role-name">Mentor</div>
+                    <div class="role-description">Guide and support students</div>
+                </div>
+
+                <div class="role-option student" data-role="student">
+                    <div class="role-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="role-name">Student</div>
+                    <div class="role-description">Learn and grow with mentors</div>
+                </div>
+
+                <div class="role-option admin" data-role="admin">
+                    <div class="role-icon">
+                        <i class="fas fa-user-shield"></i>
+                    </div>
+                    <div class="role-name">Administrator</div>
+                    <div class="role-description">Manage system and users</div>
+                </div>
+            </div>
+
+            <!-- Mentor Login Form -->
+            <form id="mentorLoginForm" class="login-form">
+                <div class="form-group">
+                    <label for="mentorEmail">Mentor Email</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="mentorEmail" class="form-control" placeholder="mentor@example.com" required>
+                    </div>
+                    <div class="error-message" id="mentorEmailError">Please enter a valid email address</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="mentorPassword">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="mentorPassword" class="form-control" placeholder="Enter your password" required>
+                        <button type="button" class="password-toggle" data-target="mentorPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="mentorPasswordError">Password must be at least 6 characters</div>
+                </div>
+
+                <div class="remember-forgot">
+                    <div class="remember-me">
+                        <input type="checkbox" id="mentorRemember">
+                        <label for="mentorRemember">Remember me</label>
+                    </div>
+                    <a href="#" class="forgot-password" data-role="mentor">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn mentor" id="mentorLoginButton">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Sign In as Mentor</span>
+                </button>
+            </form>
+
+            <!-- Student Login Form -->
+            <form id="studentLoginForm" class="login-form">
+                <div class="form-group">
+                    <label for="studentEmail">Student Email</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="studentEmail" class="form-control" placeholder="student@example.com" required>
+                    </div>
+                    <div class="error-message" id="studentEmailError">Please enter a valid email address</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="studentPassword">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="studentPassword" class="form-control" placeholder="Enter your password" required>
+                        <button type="button" class="password-toggle" data-target="studentPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="studentPasswordError">Password must be at least 6 characters</div>
+                </div>
+
+                <div class="remember-forgot">
+                    <div class="remember-me">
+                        <input type="checkbox" id="studentRemember">
+                        <label for="studentRemember">Remember me</label>
+                    </div>
+                    <a href="#" class="forgot-password" data-role="student">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn student" id="studentLoginButton">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Sign In as Student</span>
+                </button>
+            </form>
+
+            <!-- Admin Login Form -->
+            <form id="adminLoginForm" class="login-form">
+                <div class="form-group">
+                    <label for="adminEmail">Admin Email</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="adminEmail" class="form-control" placeholder="admin@mentorship.com" required>
+                    </div>
+                    <div class="error-message" id="adminEmailError">Please enter a valid email address</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="adminPassword">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="adminPassword" class="form-control" placeholder="Enter your password" required>
+                        <button type="button" class="password-toggle" data-target="adminPassword">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="adminPasswordError">Password must be at least 8 characters</div>
+                </div>
+
+                <div class="remember-forgot">
+                    <div class="remember-me">
+                        <input type="checkbox" id="adminRemember">
+                        <label for="adminRemember">Remember me</label>
+                    </div>
+                    <a href="#" class="forgot-password" data-role="admin">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn admin" id="adminLoginButton">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Sign In as Admin</span>
+                </button>
+            </form>
+
+            <!-- Social Login Options -->
+            <div class="divider" id="socialDivider">
+                <span>Or continue with</span>
+            </div>
+
+            <div class="social-login" id="socialLogin">
+                <button class="social-btn google" id="googleLogin">
+                    <i class="fab fa-google"></i>
+                    Google
+                </button>
+                <button class="social-btn microsoft" id="microsoftLogin">
+                    <i class="fab fa-microsoft"></i>
+                    Microsoft
+                </button>
+            </div>
+
+            <!-- Registration Link -->
+            <div class="register-link">
+                Don't have an account?
+                <a href="register.html" id="registerLink">Register here</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="login-footer">
+            <p>© 2023 Mentorship Management System. 
+                <a href="#">Privacy Policy</a> | 
+                <a href="#">Terms of Service</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Demo credentials for different roles
+        const demoCredentials = {
+            mentor: {
+                email: "mentor@example.com",
+                password: "mentor123",
+                name: "Sarah Johnson",
+                redirect: "mentordashboard.html"
+            },
+            student: {
+                email: "student@example.com",
+                password: "student123",
+                name: "Alex Johnson",
+                redirect: "studentdashboard.html"
+            },
+            admin: {
+                email: "admin@mentorship.com",
+                password: "admin123",
+                name: "Administrator",
+                redirect: "admindashboard.html"
+            }
+        };
+
+        // DOM Elements
+        const roleOptions = document.querySelectorAll('.role-option');
+        const loginForms = document.querySelectorAll('.login-form');
+        const successMessage = document.getElementById('successMessage');
+        const successText = document.getElementById('successText');
+        const demoHint = document.getElementById('demoHint');
+        const demoText = document.getElementById('demoText');
+        const socialDivider = document.getElementById('socialDivider');
+        const socialLogin = document.getElementById('socialLogin');
+
+        // Current selected role
+        let currentRole = null;
+
+        // Initialize
+        function init() {
+            // Add click event to role options
+            roleOptions.forEach(option => {
+                option.addEventListener('click', () => {
+                    const role = option.dataset.role;
+                    selectRole(role);
+                });
+            });
+
+            // Initialize password toggles - Fixed to use proper icon toggling
+            document.querySelectorAll('.password-toggle').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const targetId = this.dataset.target;
+                    const passwordInput = document.getElementById(targetId);
+                    const icon = this.querySelector('i');
+                    
+                    // Toggle password visibility
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        icon.classList.remove('fa-eye');
+                        icon.classList.add('fa-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        icon.classList.remove('fa-eye-slash');
+                        icon.classList.add('fa-eye');
+                    }
+                });
+            });
+
+            // Initialize form submissions
+            initForm('mentor');
+            initForm('student');
+            initForm('admin');
+
+            // Initialize social login buttons
+            document.getElementById('googleLogin').addEventListener('click', () => {
+                alert(`Google login for ${currentRole || 'selected role'}\n\nIn a real application, this would redirect to Google OAuth.`);
+            });
+
+            document.getElementById('microsoftLogin').addEventListener('click', () => {
+                alert(`Microsoft login for ${currentRole || 'selected role'}\n\nIn a real application, this would redirect to Microsoft OAuth.`);
+            });
+
+            // Initialize register link
+            document.getElementById('registerLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                showRegistrationModal();
+            });
+
+            // Initialize forgot password links
+            document.querySelectorAll('.forgot-password').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const role = this.dataset.role;
+                    handleForgotPassword(role);
+                });
+            });
+
+            // Select admin role by default for demo purposes
+            setTimeout(() => {
+                selectRole('admin');
+            }, 300);
+        }
+
+        // Select a role
+        function selectRole(role) {
+            // Update current role
+            currentRole = role;
+
+            // Update role selection UI
+            roleOptions.forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.role === role) {
+                    option.classList.add('selected');
+                }
+            });
+
+            // Show the corresponding login form
+            loginForms.forEach(form => {
+                form.classList.remove('active');
+                if (form.id === `${role}LoginForm`) {
+                    form.classList.add('active');
+                }
+            });
+
+            // Show/hide social login based on role
+            if (role === 'admin') {
+                socialDivider.style.display = 'none';
+                socialLogin.style.display = 'none';
+            } else {
+                socialDivider.style.display = 'flex';
+                socialLogin.style.display = 'grid';
+            }
+
+            // Show demo credentials hint
+            showDemoHint(role);
+        }
+
+        // Show demo credentials hint - Fixed to remove "redirects to..."
+        function showDemoHint(role) {
+            const creds = demoCredentials[role];
+            // Simplified demo hint text
+            demoText.textContent = `Demo credentials: ${creds.email} / ${creds.password}`;
+            demoHint.classList.add('show');
+        }
+
+        // Initialize form validation and submission
+        function initForm(role) {
+            const form = document.getElementById(`${role}LoginForm`);
+            const emailInput = document.getElementById(`${role}Email`);
+            const passwordInput = document.getElementById(`${role}Password`);
+            const emailError = document.getElementById(`${role}EmailError`);
+            const passwordError = document.getElementById(`${role}PasswordError`);
+            const loginButton = document.getElementById(`${role}LoginButton`);
+
+            // Email validation
+            emailInput.addEventListener('input', function() {
+                if (validateEmail(this.value)) {
+                    showSuccess(this, emailError);
+                } else {
+                    showError(this, emailError, 'Please enter a valid email address');
+                }
+            });
+
+            // Password validation
+            passwordInput.addEventListener('input', function() {
+                const minLength = role === 'admin' ? 8 : 6;
+                if (validatePassword(this.value, minLength)) {
+                    showSuccess(this, passwordError);
+                } else {
+                    showError(this, passwordError, `Password must be at least ${minLength} characters`);
+                }
+            });
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                handleLogin(role);
+            });
+        }
+
+        // Handle login
+        function handleLogin(role) {
+            const emailInput = document.getElementById(`${role}Email`);
+            const passwordInput = document.getElementById(`${role}Password`);
+            const emailError = document.getElementById(`${role}EmailError`);
+            const passwordError = document.getElementById(`${role}PasswordError`);
+            const loginButton = document.getElementById(`${role}LoginButton`);
+            const rememberMe = document.getElementById(`${role}Remember`);
+
+            // Reset previous states
+            let isValid = true;
+            
+            // Validate email
+            if (!validateEmail(emailInput.value)) {
+                showError(emailInput, emailError, 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                showSuccess(emailInput, emailError);
+            }
+            
+            // Validate password
+            const minLength = role === 'admin' ? 8 : 6;
+            if (!validatePassword(passwordInput.value, minLength)) {
+                showError(passwordInput, passwordError, `Password must be at least ${minLength} characters`);
+                isValid = false;
+            } else {
+                showSuccess(passwordInput, passwordError);
+            }
+            
+            // If form is valid, proceed with login
+            if (isValid) {
+                // Show loading state
+                loginButton.classList.add('loading');
+                loginButton.disabled = true;
+                
+                // Simulate API call delay
+                setTimeout(() => {
+                    const creds = demoCredentials[role];
+                    
+                    if (emailInput.value === creds.email && passwordInput.value === creds.password) {
+                        // Save to localStorage if "Remember me" is checked
+                        if (rememberMe && rememberMe.checked) {
+                            localStorage.setItem('rememberedRole', role);
+                            localStorage.setItem('rememberedEmail', emailInput.value);
+                        }
+
+                        // Show success message with role-specific text
+                        successText.textContent = `Login successful! Welcome, ${creds.name}. Redirecting to ${role} dashboard...`;
+                        successMessage.classList.add('show');
+
+                        // Reset button state
+                        loginButton.classList.remove('loading');
+                        loginButton.disabled = false;
+
+                        // Save user info to localStorage for use in dashboard pages
+                        localStorage.setItem('loggedInUser', JSON.stringify({
+                            role: role,
+                            email: creds.email,
+                            name: creds.name,
+                            timestamp: new Date().toISOString()
+                        }));
+
+                        // Redirect to the appropriate dashboard page after delay
+                        setTimeout(() => {
+                            window.location.href = creds.redirect;
+                        }, 1500);
+                    } else {
+                        // Show error for invalid credentials
+                        showError(emailInput, emailError, 'Invalid email or password');
+                        showError(passwordInput, passwordError, 'Invalid email or password');
+                        
+                        // Reset button state
+                        loginButton.classList.remove('loading');
+                        loginButton.disabled = false;
+                        
+                        // Shake animation for error
+                        const form = document.getElementById(`${role}LoginForm`);
+                        form.style.animation = 'shake 0.5s ease';
+                        setTimeout(() => {
+                            form.style.animation = '';
+                        }, 500);
+                    }
+                }, 1500);
+            }
+        }
+
+        // Handle forgot password
+        function handleForgotPassword(role) {
+            const defaultEmail = demoCredentials[role].email;
+            const email = prompt(`Enter your ${role} email address to reset password:`, defaultEmail);
+            
+            if (email && validateEmail(email)) {
+                alert(`Password reset link has been sent to ${email}\n\nIn a real application, this would trigger a password reset email for ${role} accounts.`);
+            } else if (email) {
+                alert("Please enter a valid email address.");
+            }
+        }
+
+        // Show registration modal
+        function showRegistrationModal() {
+            const modalContent = `
+                <div style="text-align: left;">
+                    <h3 style="margin-bottom: 15px; color: var(--primary);">Registration Options</h3>
+                    <p style="margin-bottom: 20px; color: #666;">Select the type of account you want to create:</p>
+                    
+                    <div style="display: grid; gap: 10px; margin-bottom: 20px;">
+                        <button onclick="alert('Student registration form would appear here.\\n\\nStudents can register with their academic email.')" 
+                                style="background: var(--student-color); color: white; border: none; padding: 12px; border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-user-graduate"></i>
+                            Register as Student
+                        </button>
+                        
+                        <button onclick="alert('Mentor application form would appear here.\\n\\nMentors must apply and be approved by administrators.')" 
+                                style="background: var(--mentor-color); color: white; border: none; padding: 12px; border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-user-tie"></i>
+                            Apply as Mentor
+                        </button>
+                        
+                        <button onclick="alert('Admin accounts can only be created by existing administrators.\\n\\nPlease contact system administrator.')" 
+                                style="background: var(--admin-color); color: white; border: none; padding: 12px; border-radius: var(--radius); cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-user-shield"></i>
+                            Request Admin Access
+                        </button>
+                    </div>
+                    
+                    <p style="font-size: 0.85rem; color: #777; margin-top: 15px;">
+                        Already have an account? <a href="#" onclick="selectRole('${currentRole || 'student'}'); return false;" style="color: var(--secondary); text-decoration: none;">Sign in here</a>
+                    </p>
+                </div>
+            `;
+            
+            // For simplicity, using alert. In real app, use a modal
+            alert(modalContent.replace(/<[^>]*>/g, ''));
+        }
+
+        // Validation functions
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function validatePassword(password, minLength = 6) {
+            return password.length >= minLength;
+        }
+
+        // Show error message
+        function showError(inputElement, errorElement, message) {
+            inputElement.classList.add('error');
+            inputElement.classList.remove('success');
+            errorElement.textContent = message;
+            errorElement.classList.add('show');
+        }
+
+        // Show success state
+        function showSuccess(inputElement, errorElement) {
+            inputElement.classList.remove('error');
+            inputElement.classList.add('success');
+            errorElement.classList.remove('show');
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Number keys 1, 2, 3 to select roles
+            if (e.key >= '1' && e.key <= '3') {
+                const roles = ['mentor', 'student', 'admin'];
+                const index = parseInt(e.key) - 1;
+                if (roles[index]) {
+                    selectRole(roles[index]);
+                }
+            }
+            
+            // Ctrl+Enter to submit current form
+            if (e.ctrlKey && e.key === 'Enter' && currentRole) {
+                const form = document.getElementById(`${currentRole}LoginForm`);
+                form.dispatchEvent(new Event('submit'));
+            }
+            
+            // Ctrl+D to auto-fill demo credentials for current role
+            if (e.ctrlKey && e.key === 'd' && currentRole) {
+                e.preventDefault();
+                const creds = demoCredentials[currentRole];
+                document.getElementById(`${currentRole}Email`).value = creds.email;
+                document.getElementById(`${currentRole}Password`).value = creds.password;
+                
+                // Trigger validation
+                document.getElementById(`${currentRole}Email`).dispatchEvent(new Event('input'));
+                document.getElementById(`${currentRole}Password`).dispatchEvent(new Event('input'));
+            }
+        });
+
+        // Check for remembered login
+        window.addEventListener('load', function() {
+            const rememberedRole = localStorage.getItem('rememberedRole');
+            const rememberedEmail = localStorage.getItem('rememberedEmail');
+            
+            if (rememberedRole && rememberedEmail) {
+                // Auto-select remembered role
+                selectRole(rememberedRole);
+                
+                // Fill remembered email
+                const emailInput = document.getElementById(`${rememberedRole}Email`);
+                if (emailInput) {
+                    emailInput.value = rememberedEmail;
+                    emailInput.dispatchEvent(new Event('input'));
+                }
+                
+                // Check the remember me checkbox
+                const rememberCheckbox = document.getElementById(`${rememberedRole}Remember`);
+                if (rememberCheckbox) {
+                    rememberCheckbox.checked = true;
+                }
+                
+                // Show welcome back message
+                setTimeout(() => {
+                    demoText.textContent = `Welcome back! Your email is pre-filled.`;
+                    demoHint.classList.add('show');
+                }, 500);
+            }
+            
+            // Log demo credentials to console
+            console.log("Demo Credentials:");
+            console.log("1. Mentor: mentor@example.com / mentor123 ");
+            console.log("2. Student: student@example.com / student123 ");
+            console.log("3. Admin: admin@mentorship.com / admin123");
+            console.log("\nKeyboard Shortcuts:");
+            console.log("1, 2, 3 - Select role (Mentor, Student, Admin)");
+            console.log("Ctrl+Enter - Submit form");
+            console.log("Ctrl+D - Auto-fill demo credentials");
+        });
+
+        // Initialize the application
+        init();
+    </script>
+</body>
+</html>
