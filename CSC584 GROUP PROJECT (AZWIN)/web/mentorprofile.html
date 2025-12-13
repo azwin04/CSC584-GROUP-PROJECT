@@ -217,6 +217,143 @@
             font-size: 0.7rem;
         }
 
+        /* Notification Popup Styles - Added from mystudent.html */
+        .notifications-popup {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 400px;
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notifications-popup-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notifications-popup-header h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .notifications-popup-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            align-items: flex-start;
+            transition: background-color 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .notification-item.unread {
+            background-color: #f0f7ff;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .notification-icon.success {
+            background-color: #e7f7ef;
+            color: var(--success);
+        }
+
+        .notification-icon.warning {
+            background-color: #fef9e7;
+            color: #f39c12;
+        }
+
+        .notification-icon.info {
+            background-color: #e8f4fd;
+            color: var(--secondary);
+        }
+
+        .notification-icon.error {
+            background-color: #fdedec;
+            color: var(--accent);
+        }
+
+        .notification-details h4 {
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .notification-details p {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .notifications-popup-footer {
+            padding: 15px 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+
+        .mark-all-read {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .mark-all-read:hover {
+            text-decoration: underline;
+        }
+
+        /* Notification dropdown arrow */
+        .notifications-popup::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid white;
+        }
+
         /* Sections */
         .section {
             background-color: white;
@@ -423,7 +560,6 @@
             color: #777;
         }
 
-        /* Table Styles - Consistent for all tables */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -593,7 +729,6 @@
             cursor: pointer;
         }
 
-        /* Logout Confirmation Modal - Updated to match schedulesession.html */
         .logout-modal {
             background-color: white;
             margin: 5% auto;
@@ -757,6 +892,15 @@
             .logout-modal-btn {
                 width: 100%;
             }
+            
+            .notifications-popup {
+                width: 300px;
+                right: -50px;
+            }
+            
+            .notifications-popup::before {
+                right: 50px;
+            }
         }
 
         @media (max-width: 768px) {
@@ -801,6 +945,15 @@
             .modal-content, .logout-modal {
                 padding: 20px;
                 margin: 10px auto;
+            }
+            
+            .notifications-popup {
+                width: 280px;
+                right: -70px;
+            }
+            
+            .notifications-popup::before {
+                right: 70px;
             }
         }
     </style>
@@ -864,9 +1017,72 @@
         <div class="main-content">
             <div class="header">
                 <h2>My Profile</h2>
-                <div class="notifications" onclick="showNotification()">
+                <div class="notifications" onclick="toggleNotifications()">
                     <i class="fas fa-bell fa-lg"></i>
                     <div class="notification-badge">3</div>
+                    
+                    <!-- Notifications Popup -->
+                    <div class="notifications-popup" id="notificationsPopup">
+                        <div class="notifications-popup-header">
+                            <h3>Notifications</h3>
+                            <button class="modal-close-btn" onclick="closeNotifications()">&times;</button>
+                        </div>
+                        <div class="notifications-popup-content">
+                            <div class="notification-item unread">
+                                <div class="notification-icon warning">
+                                    <i class="fas fa-user-edit"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Profile Update Requested</h4>
+                                    <p>Admin requested you to update your profile information.</p>
+                                    <div class="notification-time">2 hours ago</div>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="notification-icon success">
+                                    <i class="fas fa-envelope-open-text"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>New Program Invitation</h4>
+                                    <p>You've been invited to join the AI Mentorship Program.</p>
+                                    <div class="notification-time">1 day ago</div>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="notification-icon info">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Profile Completion</h4>
+                                    <p>Your profile is 95% complete. Add more expertise areas.</p>
+                                    <div class="notification-time">2 days ago</div>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon success">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Profile Updated</h4>
+                                    <p>Your profile was successfully updated on June 10.</p>
+                                    <div class="notification-time">3 days ago</div>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon info">
+                                    <i class="fas fa-calendar-star"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Availability Reminder</h4>
+                                    <p>Your availability slots for next week need confirmation.</p>
+                                    <div class="notification-time">4 days ago</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="notifications-popup-footer">
+                            <button class="mark-all-read" onclick="markAllAsRead()">Mark All as Read</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -896,7 +1112,7 @@
                 </div>
             </div>
 
-            <!-- Edit Mentor Profile (Based on MENTOR Table) -->
+            <!-- Edit Mentor Profile -->
             <div class="section">
                 <div class="section-header">
                     <h3>Edit Mentor Profile</h3>
@@ -980,7 +1196,7 @@
                 </form>
             </div>
 
-            <!-- User Account (Based on USER Table) -->
+            <!-- User Account -->
             <div class="section">
                 <div class="section-header">
                     <h3>User Account</h3>
@@ -1011,7 +1227,7 @@
                 <button class="btn" onclick="updateUserAccount()">Update Account</button>
             </div>
 
-            <!-- Programs Involvement (Based on PROGRAM Table) -->
+            <!-- Programs Involvement -->
             <div class="section">
                 <div class="section-header">
                     <h3>Programs Involved</h3>
@@ -1021,16 +1237,15 @@
                 <table id="programsTable">
                     <thead>
                         <tr>
-                            <th>ProgramID</th>
-                            <th>Program_Name</th>
-                            <th>Program_Date</th>
+                            <th>Program ID</th>
+                            <th>Program Name</th>
+                            <th>Program Date</th>
                             <th>Location</th>
                             <th>Description</th>
                             <th>Status</th>
                         </tr>
                     </thead>
                     <tbody id="programsTableBody">
-                        <!-- Programs data will be populated here -->
                     </tbody>
                 </table>
             </div>
@@ -1041,7 +1256,7 @@
         </div>
     </div>
 
-    <!-- Logout Confirmation Modal - Updated to match schedulesession.html -->
+    <!-- Logout Confirmation Modal -->
     <div id="logoutModal" class="modal">
         <div class="logout-modal">
             <div class="logout-modal-header">
@@ -1111,37 +1326,12 @@
                         </tr>
                     </thead>
                     <tbody id="allProgramsTableBody">
-                        <!-- All programs data will be populated here -->
                     </tbody>
                 </table>
             </div>
             
             <div class="modal-buttons">
                 <button class="modal-close" onclick="closeModal()">Close</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Notifications Modal -->
-    <div id="notificationsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Notifications</h2>
-                <button class="modal-close-btn" onclick="closeModal()">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="modal-icon modal-warning">
-                    <i class="fas fa-bell"></i>
-                </div>
-                <div class="modal-message">
-                    <strong>You have 3 notifications:</strong><br><br>
-                    1. <span style="color: var(--accent);">Profile update requested by admin</span><br>
-                    2. <span style="color: var(--success);">New program invitation: AI Mentorship Program</span><br>
-                    3. <span style="color: var(--secondary);">System: Your profile is 95% complete</span>
-                </div>
-                <div class="modal-buttons">
-                    <button class="modal-close" onclick="closeModal()">Mark as Read</button>
-                </div>
             </div>
         </div>
     </div>
@@ -1236,8 +1426,8 @@
             {
                 programID: "PROG001",
                 programName: "Tech Mentorship Program",
-                startDate: "2023-01-15",
-                endDate: "2023-12-15",
+                startDate: "2025-01-15",
+                endDate: "2025-12-15",
                 location: "Main Campus, Building A",
                 description: "Technology focused mentorship for computer science students",
                 capacity: 50,
@@ -1251,8 +1441,8 @@
             {
                 programID: "PROG002",
                 programName: "Business Leadership Program",
-                startDate: "2023-03-10",
-                endDate: "2023-11-30",
+                startDate: "2025-03-10",
+                endDate: "2025-11-30",
                 location: "Business School, Room 301",
                 description: "Leadership development for business students",
                 capacity: 30,
@@ -1266,8 +1456,8 @@
             {
                 programID: "PROG003",
                 programName: "Research Mentorship Program",
-                startDate: "2023-02-01",
-                endDate: "2023-10-31",
+                startDate: "2025-02-01",
+                endDate: "2025-10-31",
                 location: "Science Building, Lab 205",
                 description: "Research methodology guidance for science students",
                 capacity: 25,
@@ -1281,8 +1471,8 @@
             {
                 programID: "PROG004",
                 programName: "AI & Machine Learning Program",
-                startDate: "2023-09-01",
-                endDate: "2024-05-31",
+                startDate: "2025-09-01",
+                endDate: "2026-05-31",
                 location: "Tech Innovation Hub",
                 description: "Advanced AI and machine learning mentorship",
                 capacity: 40,
@@ -1296,8 +1486,8 @@
             {
                 programID: "PROG005",
                 programName: "Startup Accelerator Program",
-                startDate: "2022-08-15",
-                endDate: "2023-06-30",
+                startDate: "2024-08-15",
+                endDate: "2025-06-30",
                 location: "Entrepreneurship Center",
                 description: "Entrepreneurship and startup mentorship",
                 capacity: 20,
@@ -1311,8 +1501,8 @@
             {
                 programID: "PROG006",
                 programName: "Cybersecurity Mentorship",
-                startDate: "2023-10-01",
-                endDate: "2024-03-31",
+                startDate: "2025-10-01",
+                endDate: "2026-03-31",
                 location: "Security Lab, Building C",
                 description: "Cybersecurity skills development program",
                 capacity: 35,
@@ -1326,8 +1516,8 @@
             {
                 programID: "PROG007",
                 programName: "Data Science Bootcamp",
-                startDate: "2022-11-01",
-                endDate: "2023-04-30",
+                startDate: "2024-11-01",
+                endDate: "2025-04-30",
                 location: "Data Science Lab",
                 description: "Intensive data science training program",
                 capacity: 25,
@@ -1341,8 +1531,8 @@
             {
                 programID: "PROG008",
                 programName: "Healthcare Innovation Program",
-                startDate: "2023-07-01",
-                endDate: "2024-02-28",
+                startDate: "2025-07-01",
+                endDate: "2026-02-28",
                 location: "Medical School, Room 105",
                 description: "Healthcare technology and innovation mentorship",
                 capacity: 20,
@@ -1387,7 +1577,24 @@
                 });
             });
             
-            // Logout functionality
+            // Setup logout functionality
+            setupLogout();
+            
+            // Close notifications when clicking outside
+            document.addEventListener('click', function(event) {
+                const notificationsPopup = document.getElementById('notificationsPopup');
+                const notificationsIcon = document.querySelector('.notifications');
+                
+                if (notificationsPopup.style.display === 'block' && 
+                    !notificationsPopup.contains(event.target) && 
+                    !notificationsIcon.contains(event.target)) {
+                    closeNotifications();
+                }
+            });
+        });
+
+        // Setup logout functionality
+        function setupLogout() {
             const logoutBtn = document.getElementById('logoutBtn');
             const logoutModal = document.getElementById('logoutModal');
             const cancelLogoutBtn = document.getElementById('cancelLogout');
@@ -1397,6 +1604,9 @@
             logoutBtn.addEventListener('click', () => {
                 logoutModal.style.display = 'block';
                 document.body.style.overflow = 'hidden';
+                
+                // Close notifications if open
+                closeNotifications();
             });
 
             // Hide logout confirmation modal
@@ -1407,15 +1617,69 @@
 
             // Confirm logout
             confirmLogoutBtn.addEventListener('click', () => {
-                // Show logout message
-                alert('Logging out... Redirecting to login page.');
-                
-                // Simulate delay before redirect
+                alert('Logging out... Redirecting to login page.');                
                 setTimeout(() => {
                     window.location.href = 'login.html';
                 }, 1000);
             });
-        });
+        }
+
+        // Toggle notifications popup
+        function toggleNotifications() {
+            const popup = document.getElementById('notificationsPopup');
+            if (popup.style.display === 'block') {
+                closeNotifications();
+            } else {
+                openNotifications();
+            }
+        }
+
+        // Open notifications popup
+        function openNotifications() {
+            const popup = document.getElementById('notificationsPopup');
+            popup.style.display = 'block';
+            
+            // Close any other open modals
+            closeAllModalsExcept('notificationsPopup');
+        }
+
+        // Close notifications popup
+        function closeNotifications() {
+            document.getElementById('notificationsPopup').style.display = 'none';
+        }
+
+        // Mark all notifications as read
+        function markAllAsRead() {
+            const notificationItems = document.querySelectorAll('.notification-item.unread');
+            notificationItems.forEach(item => {
+                item.classList.remove('unread');
+            });
+            
+            document.querySelector('.notification-badge').textContent = '0';
+            document.querySelector('.notification-badge').style.display = 'none';
+            
+            // Close the popup
+            closeNotifications();
+        }
+
+        // Close all modals except the specified one
+        function closeAllModalsExcept(modalIdToKeep) {
+            const modals = [
+                'successModal', 
+                'allProgramsModal', 
+                'addExpertiseModal',
+                'addTimeSlotModal',
+                'logoutModal'
+            ];
+            modals.forEach(modalId => {
+                if (modalId !== modalIdToKeep) {
+                    const modal = document.getElementById(modalId);
+                    if (modal) {
+                        modal.style.display = 'none';
+                    }
+                }
+            });
+        }
 
         // Populate programs table on the main page
         function populateProgramsTable() {
@@ -1628,17 +1892,11 @@
             document.getElementById('allProgramsModal').style.display = 'block';
         }
 
-        // Show notification modal
-        function showNotification() {
-            document.getElementById('notificationsModal').style.display = 'block';
-        }
-
         // Close all modals
         function closeModal() {
             const modals = [
                 'successModal', 
                 'allProgramsModal', 
-                'notificationsModal',
                 'addExpertiseModal',
                 'addTimeSlotModal',
                 'logoutModal'
@@ -1654,23 +1912,27 @@
             const modals = [
                 'successModal', 
                 'allProgramsModal', 
-                'notificationsModal',
                 'addExpertiseModal',
                 'addTimeSlotModal',
-                'logoutModal'
+                'logoutModal',
+                'notificationsPopup'
             ];
             modals.forEach(modalId => {
                 const modal = document.getElementById(modalId);
                 if (event.target === modal) {
-                    closeModal();
+                    if (modalId === 'notificationsPopup') {
+                        closeNotifications();
+                    } else {
+                        closeModal();
+                    }
                 }
             });
         }
 
-        // Close modal with Escape key
         document.addEventListener('keydown', function(event) {
             if (event.key === 'Escape') {
                 closeModal();
+                closeNotifications();
             }
         });
     </script>
