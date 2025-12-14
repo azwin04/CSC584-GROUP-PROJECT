@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mentor Portal - Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --info: #17a2b8;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary);
+            color: white;
+            padding: 25px 0;
+            box-shadow: var(--shadow);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo-area h1 {
+            font-size: 1.5rem;
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .logo-icon {
+            background-color: var(--secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 5px;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .nav-links i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--accent);
+        }
+
+        .logout-btn i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .user-info {
+            position: absolute;
+            bottom: 80px;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 12px;
+        }
+
+        .user-details h4 {
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+        }
+
+        .user-details p {
+            font-size: 0.8rem;
+            color: #bbb;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        /* Notification Popup Styles */
+        .notifications-popup {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 400px;
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notifications-popup-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notifications-popup-header h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .notifications-popup-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            align-items: flex-start;
+            transition: background-color 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .notification-item.unread {
+            background-color: #f0f7ff;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .notification-icon.success {
+            background-color: #e7f7ef;
+            color: var(--success);
+        }
+
+        .notification-icon.warning {
+            background-color: #fef9e7;
+            color: #f39c12;
+        }
+
+        .notification-icon.info {
+            background-color: #e8f4fd;
+            color: var(--secondary);
+        }
+
+        .notification-icon.error {
+            background-color: #fdedec;
+            color: var(--accent);
+        }
+
+        .notification-details h4 {
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .notification-details p {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .notifications-popup-footer {
+            padding: 15px 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+
+        .mark-all-read {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .mark-all-read:hover {
+            text-decoration: underline;
+        }
+        
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+
+        /* Notification dropdown arrow */
+        .notifications-popup::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid white;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.3rem;
+            color: white;
+        }
+
+        .card-icon.students {
+            background-color: var(--secondary);
+        }
+
+        .card-icon.sessions {
+            background-color: var(--success);
+        }
+
+        .card-icon.mentorships {
+            background-color: var(--warning);
+        }
+
+        .card-icon.programs {
+            background-color: var(--info);
+        }
+
+        .card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        /* Sections */
+        .section {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .section-header h3 {
+            color: var(--primary);
+            font-size: 1.4rem;
+        }
+
+        .btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f8f9fa;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 1px solid #eee;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status.active {
+            background-color: #e7f7ef;
+            color: var(--success);
+        }
+
+        .status.completed {
+            background-color: #e8f4fd;
+            color: var(--secondary);
+        }
+
+        .avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background-color: #ddd;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 10px;
+            color: var(--primary);
+        }
+
+        /* Logout Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .logout-modal {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--shadow);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .logout-modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ffeaea;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .modal-header h3 {
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .modal-body {
+            margin-bottom: 25px;
+        }
+
+        .modal-body p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.cancel {
+            background-color: #ecf0f1;
+            color: #333;
+        }
+
+        .modal-btn.cancel:hover {
+            background-color: #d5dbdb;
+        }
+
+        .modal-btn.logout {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .modal-btn.logout:hover {
+            background-color: #c0392b;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+                padding-top: 25px;
+            }
+
+            .logo-area h1, .user-details, .nav-links a span, .logout-btn span {
+                display: none;
+            }
+
+            .logo-area {
+                justify-content: center;
+                padding: 0 0 25px;
+            }
+
+            .logo-icon {
+                margin: 0;
+            }
+
+            .nav-links a {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .nav-links i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+
+            .logout-btn {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .logout-btn i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+
+            .user-profile {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .user-avatar {
+                margin-right: 0;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .notifications-popup {
+                width: 300px;
+                right: -50px;
+            }
+            
+            .notifications-popup::before {
+                right: 50px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .header h2 {
+                font-size: 1.4rem;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .modal-btn {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .main-content {
+                padding: 20px 15px;
+            }
+
+            .section {
+                padding: 20px 15px;
+            }
+            
+            .notifications-popup {
+                width: 280px;
+                right: -70px;
+            }
+            
+            .notifications-popup::before {
+                right: 70px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>Mentor Portal</h1>
+            </div>
+
+            <ul class="nav-links">
+                <li>
+                    <a href="mentordashboard.html" class="active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="mystudent.html">
+                        <i class="fas fa-users"></i>
+                        <span>My Students</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="schedulesession.html">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Schedule Sessions</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="mentorprofile.html">
+                        <i class="fas fa-user-cog"></i>
+                        <span>Profile</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="user-info">
+                <div class="user-profile">
+                    <div class="user-avatar">AZ</div>
+                    <div class="user-details">
+                        <h4>Azwin</h4>
+                        <p>Senior Mentor</p>
+                    </div>
+                </div>
+                
+                <!-- Logout Button -->
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <h2>Dashboard</h2>
+                <div class="notifications" onclick="toggleNotifications()">
+                    <i class="fas fa-bell fa-lg"></i>
+                    <div class="notification-badge">4</div>
+                    
+                    <!-- Notifications Popup -->
+                    <div class="notifications-popup" id="notificationsPopup">
+                        <div class="notifications-popup-header">
+                            <h3>Notifications</h3>
+                            <button class="modal-close-btn" onclick="closeNotifications()">&times;</button>
+                        </div>
+                        <div class="notifications-popup-content">
+                            <div class="notification-item unread">
+                                <div class="notification-icon success">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Project Draft Submitted</h4>
+                                    <p>John Smith submitted his project draft for review.</p>
+                                    <div class="notification-time">1 hour ago</div>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="notification-icon info">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>New Student Assignment</h4>
+                                    <p>You have been assigned a new student: David Kim (STU005).</p>
+                                    <div class="notification-time">3 hours ago</div>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="notification-icon warning">
+                                    <i class="fas fa-calendar-alt"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Session Reminder</h4>
+                                    <p>You have a session with Maria Johnson tomorrow at 2:30 PM.</p>
+                                    <div class="notification-time">5 hours ago</div>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="notification-icon info">
+                                    <i class="fas fa-tools"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>System Maintenance</h4>
+                                    <p>Scheduled maintenance on June 20 from 2:00 AM to 4:00 AM.</p>
+                                    <div class="notification-time">Yesterday</div>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon success">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Program Milestone</h4>
+                                    <p>Tech Mentorship Program reached 80% completion rate.</p>
+                                    <div class="notification-time">2 days ago</div>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon success">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Monthly Report Ready</h4>
+                                    <p>Your monthly mentorship report for May is now available.</p>
+                                    <div class="notification-time">3 days ago</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="notifications-popup-footer">
+                            <button class="mark-all-read" onclick="markAllAsRead()">Mark All as Read</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Cards -->
+            <div class="dashboard-cards">
+                <div class="card" onclick="window.location.href='mystudent.html'">
+                    <div class="card-header">
+                        <div class="card-icon students">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <h3>8</h3>
+                            <p>Assigned Students</p>
+                        </div>
+                    </div>
+                    <p>Based on active mentorships</p>
+                </div>
+
+                <div class="card" onclick="window.location.href='schedulesession.html'">
+                    <div class="card-header">
+                        <div class="card-icon sessions">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div>
+                            <h3>5</h3>
+                            <p>Upcoming Sessions</p>
+                        </div>
+                    </div>
+                    <p>Next: Today at 10:00 AM</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon mentorships">
+                            <i class="fas fa-handshake"></i>
+                        </div>
+                        <div>
+                            <h3>6</h3>
+                            <p>Active Mentorships</p>
+                        </div>
+                    </div>
+                    <p>3 completed this semester</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon programs">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div>
+                            <h3>4</h3>
+                            <p>Programs Involved</p>
+                        </div>
+                    </div>
+                    <p>Tech Mentorship Program active</p>
+                </div>
+            </div>
+
+            <!-- Upcoming Sessions -->
+            <div class="section">
+                <div class="section-header">
+                    <h3>Upcoming Sessions</h3>
+                    <a href="schedulesession.html" class="btn">Schedule New</a>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Session ID</th>
+                            <th>Student</th>
+                            <th>Date & Time</th>
+                            <th>Topic</th>
+                            <th>Location</th>
+                            <th>Attendance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>SESS015</td>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="avatar">JS</div>
+                                    <span>John Smith</span>
+                                </div>
+                            </td>
+                            <td>Today | 10:00 AM</td>
+                            <td>Career Planning</td>
+                            <td>Room 205</td>
+                            <td><span class="status active">Scheduled</span></td>
+                        </tr>
+                        <tr>
+                            <td>SESS016</td>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="avatar">MJ</div>
+                                    <span>Maria Johnson</span>
+                                </div>
+                            </td>
+                            <td>Tomorrow | 2:30 PM</td>
+                            <td>Project Review</td>
+                            <td>Zoom Meeting</td>
+                            <td><span class="status active">Scheduled</span></td>
+                        </tr>
+                        <tr>
+                            <td>SESS017</td>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div class="avatar">RW</div>
+                                    <span>Robert Williams</span>
+                                </div>
+                            </td>
+                            <td>June 18 | 11:00 AM</td>
+                            <td>Technical Interview Prep</td>
+                            <td>Google Meet</td>
+                            <td><span class="status active">Scheduled</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Recent Mentorships -->
+            <div class="section">
+                <div class="section-header">
+                    <h3>Active Mentorships</h3>
+                    <a href="mystudent.html" class="btn">View All</a>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Mentorship ID</th>
+                            <th>Student</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Program</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>MENT008</td>
+                            <td>Nur Aisya</td>
+                            <td>2025-01-15</td>
+                            <td>2025-12-15</td>
+                            <td>Tech Mentorship Program</td>
+                            <td><span class="status active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>MENT009</td>
+                            <td>Anissa Syuhada</td>
+                            <td>2025-03-10</td>
+                            <td>2025-11-30</td>
+                            <td>Business Leadership</td>
+                            <td><span class="status active">Active</span></td>
+                        </tr>
+                        <tr>
+                            <td>MENT010</td>
+                            <td>Kim Mingyu</td>
+                            <td>2025-02-01</td>
+                            <td>2025-10-31</td>
+                            <td>Research Mentorship</td>
+                            <td><span class="status active">Active</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="footer">
+                <p>Student Mentorship Program System © 2025</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal-overlay" id="logoutModal">
+        <div class="logout-modal">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <h3>Confirm Logout</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to logout from the Mentor Portal?</p>
+                <p style="font-size: 0.9rem; color: #888; margin-top: 10px;">You will be redirected to the login page.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancelLogout">Cancel</button>
+                <button class="modal-btn logout" id="confirmLogout">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set today's date for the first session
+        const today = new Date().toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        
+        // Update the first session date to today
+        document.querySelector("table tbody tr:first-child td:nth-child(3)").innerHTML = `Today | 10:00 AM`;
+        
+        // Set tomorrow's date
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowFormatted = tomorrow.toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            month: 'short', 
+            day: 'numeric' 
+        });
+        document.querySelector("table tbody tr:nth-child(2) td:nth-child(3)").innerHTML = `Tomorrow | 2:30 PM`;
+
+        // Toggle notifications popup
+        function toggleNotifications() {
+            const popup = document.getElementById('notificationsPopup');
+            if (popup.style.display === 'block') {
+                closeNotifications();
+            } else {
+                openNotifications();
+            }
+        }
+
+        // Open notifications popup
+        function openNotifications() {
+            const popup = document.getElementById('notificationsPopup');
+            popup.style.display = 'block';
+            
+            // Close logout modal if open
+            closeLogoutModal();
+            
+            // Prevent body scrolling
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Close notifications popup
+        function closeNotifications() {
+            document.getElementById('notificationsPopup').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Mark all notifications as read
+        function markAllAsRead() {
+            const notificationItems = document.querySelectorAll('.notification-item.unread');
+            notificationItems.forEach(item => {
+                item.classList.remove('unread');
+            });
+            
+            // Update badge count
+            document.querySelector('.notification-badge').textContent = '0';
+            document.querySelector('.notification-badge').style.display = 'none';
+            
+            // Close the popup
+            closeNotifications();
+        }
+
+        // Close logout modal
+        function closeLogoutModal() {
+            const logoutModal = document.getElementById('logoutModal');
+            logoutModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Setup logout functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Logout functionality
+            const logoutBtn = document.getElementById('logoutBtn');
+            const logoutModal = document.getElementById('logoutModal');
+            const cancelLogoutBtn = document.getElementById('cancelLogout');
+            const confirmLogoutBtn = document.getElementById('confirmLogout');
+
+            // Show logout confirmation modal
+            logoutBtn.addEventListener('click', () => {
+                logoutModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                
+                // Close notifications if open
+                closeNotifications();
+            });
+
+            // Hide logout confirmation modal
+            cancelLogoutBtn.addEventListener('click', () => {
+                closeLogoutModal();
+            });
+
+            // Close modal when clicking outside
+            logoutModal.addEventListener('click', (e) => {
+                if (e.target === logoutModal) {
+                    closeLogoutModal();
+                }
+            });
+
+            // Confirm logout
+            confirmLogoutBtn.addEventListener('click', () => {
+                // Show logout message
+                alert('Logging out... Redirecting to login page.');
+                setTimeout(() => {
+                    // Redirect to login page
+                    window.location.href = 'index.html';
+                }, 1000);
+            });
+
+            // Close notifications when clicking outside
+            document.addEventListener('click', function(event) {
+                const notificationsPopup = document.getElementById('notificationsPopup');
+                const notificationsIcon = document.querySelector('.notifications');
+                
+                if (notificationsPopup.style.display === 'block' && 
+                    !notificationsPopup.contains(event.target) && 
+                    !notificationsIcon.contains(event.target)) {
+                    closeNotifications();
+                }
+            });
+
+            // Also handle escape key to close modals
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (logoutModal.classList.contains('active')) {
+                        closeLogoutModal();
+                    }
+                    if (document.getElementById('notificationsPopup').style.display === 'block') {
+                        closeNotifications();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

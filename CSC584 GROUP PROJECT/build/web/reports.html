@@ -1,0 +1,2341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Mentorship System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Add Chart.js library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --info: #17a2b8;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary);
+            color: white;
+            padding: 25px 0;
+            box-shadow: var(--shadow);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo-area h1 {
+            font-size: 1.5rem;
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .logo-icon {
+            background-color: var(--secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 5px;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .nav-links i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--accent);
+        }
+
+        .logout-btn i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .user-info {
+            position: absolute;
+            bottom: 80px;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 12px;
+        }
+
+        .user-details h4 {
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+        }
+
+        .user-details p {
+            font-size: 0.8rem;
+            color: #bbb;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        /* Notification Popup Styles */
+        .notifications-popup {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 400px;
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notifications-popup-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notifications-popup-header h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .notifications-popup-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            align-items: flex-start;
+            transition: background-color 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .notification-item.unread {
+            background-color: #f0f7ff;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .notification-icon.success {
+            background-color: #e7f7ef;
+            color: var(--success);
+        }
+
+        .notification-icon.warning {
+            background-color: #fef9e7;
+            color: #f39c12;
+        }
+
+        .notification-icon.info {
+            background-color: #e8f4fd;
+            color: var(--secondary);
+        }
+
+        .notification-icon.error {
+            background-color: #fdedec;
+            color: var(--accent);
+        }
+
+        .notification-details h4 {
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .notification-details p {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .notifications-popup-footer {
+            padding: 15px 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+
+        .mark-all-read {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .mark-all-read:hover {
+            text-decoration: underline;
+        }
+        
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+
+        /* Notification dropdown arrow */
+        .notifications-popup::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid white;
+        }
+
+        /* Sections */
+        .section {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .section-header h3 {
+            color: var(--primary);
+            font-size: 1.4rem;
+        }
+
+        .btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+        }
+
+        .btn-danger {
+            background-color: var(--accent);
+        }
+
+        .btn-info {
+            background-color: var(--info);
+        }
+
+        /* Reports Header */
+        .reports-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .date-filter {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .date-filter select,
+        .date-filter input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+        }
+
+        /* Key Metrics Cards */
+        .metrics-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .metric-card {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .metric-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .metric-icon.active {
+            background-color: var(--success);
+        }
+
+        .metric-icon.sessions {
+            background-color: var(--info);
+        }
+
+        .metric-icon.rating {
+            background-color: var(--warning);
+        }
+
+        .metric-icon.completion {
+            background-color: #9b59b6;
+        }
+
+        .metric-card h3 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .metric-card p {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .metric-trend {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .trend-up {
+            background-color: #e7f7ef;
+            color: var(--success);
+        }
+
+        .trend-down {
+            background-color: #fdedec;
+            color: var(--accent);
+        }
+
+        .trend-neutral {
+            background-color: #f5f5f5;
+            color: #777;
+        }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-container {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-header h4 {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .chart-wrapper {
+            height: 300px;
+            position: relative;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f8f9fa;
+        }
+
+        th {
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 1px solid #eee;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .rating-stars {
+            color: #f39c12;
+            font-size: 0.9rem;
+        }
+
+        /* Detailed Reports Section - FIXED */
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .report-card {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+
+        .report-card h4 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            position: sticky;
+            left: 0;
+        }
+
+        /* Make completion table more compact */
+        .compact-table {
+            font-size: 0.9rem;
+        }
+        
+        .compact-table th,
+        .compact-table td {
+            padding: 10px 12px;
+        }
+        
+        .compact-table th:nth-child(1) {
+            min-width: 150px;
+        }
+        
+        .compact-table th:nth-child(2),
+        .compact-table th:nth-child(3) {
+            min-width: 80px;
+            text-align: center;
+        }
+        
+        .compact-table th:nth-child(4) {
+            min-width: 120px;
+        }
+        
+        .compact-table td:nth-child(2),
+        .compact-table td:nth-child(3) {
+            text-align: center;
+        }
+
+        /* Logout Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .logout-modal {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--shadow);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .logout-modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ffeaea;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .modal-header h3 {
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .modal-body {
+            margin-bottom: 25px;
+        }
+
+        .modal-body p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.cancel {
+            background-color: #ecf0f1;
+            color: #333;
+        }
+
+        .modal-btn.cancel:hover {
+            background-color: #d5dbdb;
+        }
+
+        .modal-btn.logout {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .modal-btn.logout:hover {
+            background-color: #c0392b;
+        }
+
+        /* Export Modal */
+        .export-modal {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .export-modal {
+            transform: translateY(0);
+        }
+
+        .export-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .export-option {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #eee;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .export-option:hover {
+            border-color: var(--secondary);
+            background-color: #f8fafc;
+        }
+
+        .export-option.selected {
+            border-color: var(--secondary);
+            background-color: #e8f4fd;
+        }
+
+        .export-option i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+
+        .export-option h4 {
+            font-size: 1rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .export-option p {
+            font-size: 0.85rem;
+            color: #666;
+            text-align: center;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+                padding-top: 25px;
+            }
+
+            .logo-area h1, .user-details, .nav-links a span, .logout-btn span {
+                display: none;
+            }
+
+            .logo-area {
+                justify-content: center;
+                padding: 0 0 25px;
+            }
+
+            .logo-icon {
+                margin: 0;
+            }
+
+            .nav-links a {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .nav-links i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+
+            .logout-btn {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .logout-btn i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+
+            .user-profile {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .user-avatar {
+                margin-right: 0;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .notifications-popup {
+                width: 300px;
+                right: -50px;
+            }
+            
+            .notifications-popup::before {
+                right: 50px;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h2 {
+                font-size: 1.4rem;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .modal-btn {
+                width: 100%;
+            }
+
+            .reports-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .date-filter {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-container {
+                padding: 20px 15px;
+            }
+
+            .chart-wrapper {
+                height: 250px;
+            }
+
+            .metrics-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .export-options {
+                grid-template-columns: 1fr;
+            }
+            
+            .compact-table {
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 20px 15px;
+            }
+
+            .section {
+                padding: 20px 15px;
+            }
+            
+            .notifications-popup {
+                width: 280px;
+                right: -70px;
+            }
+            
+            .notifications-popup::before {
+                right: 70px;
+            }
+
+            .metrics-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-wrapper {
+                height: 200px;
+            }
+            
+            .reports-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .report-card {
+                padding: 20px 15px;
+            }
+            
+            .compact-table th,
+            .compact-table td {
+                padding: 8px 10px;
+            }
+        }
+
+        /* Custom chart styling */
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .chart-legend-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        
+        .chart-color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <h1>Student Portal</h1>
+            </div>
+            
+            <ul class="nav-links">
+                <li>
+                    <a href="admindashboard.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="usermanage.html">
+                        <i class="fas fa-users"></i>
+                        <span>User Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="progmanage.html">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Program Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#reports.html" class="active">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="user-info">
+                <div class="user-profile">
+                    <div class="user-avatar">AS</div>
+                    <div class="user-details">
+                        <h4>Anissa Syuhada</h4>
+                        <p>Administrator</p>
+                    </div>
+                </div>
+                
+                <button class="logout-btn" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h2>Reports & Analytics</h2>
+                <div class="notifications" id="notifications">
+                    <i class="fas fa-bell fa-lg"></i>
+                    <span class="notification-badge">2</span>
+                    <div class="notifications-popup" id="notifications-popup">
+                        <div class="notifications-popup-header">
+                            <h3>Notifications</h3>
+                            <button class="modal-close-btn" onclick="closeNotifications()">&times;</button>
+                        </div>
+                        <div class="notifications-popup-content">
+                            <div class="notification-item unread">
+                                <div class="notification-icon info">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Monthly Report Ready</h4>
+                                    <p>October mentorship report is now available for review.</p>
+                                    <span class="notification-time">2 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="notification-icon warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Low Feedback Response</h4>
+                                    <p>Only 45% of students have submitted session feedback this month.</p>
+                                    <span class="notification-time">1 day ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon success">
+                                    <i class="fas fa-trophy"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Record High Satisfaction</h4>
+                                    <p>Tech Mentorship program achieved 4.9/5 satisfaction rating this quarter.</p>
+                                    <span class="notification-time">3 days ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="notifications-popup-footer">
+                            <button class="mark-all-read" onclick="markAllAsRead()">Mark all as read</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Reports Header -->
+            <div class="reports-header">
+                <div>
+                    <h3 style="color: var(--primary); margin-bottom: 5px;">Mentorship Performance Overview</h3>
+                    <p style="color: #666;">Last updated: Today, 10:30 AM</p>
+                </div>
+                <div class="date-filter">
+                    <select id="time-period" onchange="updateReports()">
+                        <option value="month">This Month</option>
+                        <option value="quarter" selected>This Quarter</option>
+                        <option value="year">This Year</option>
+                        <option value="all">All Time</option>
+                    </select>
+                    <input type="date" id="custom-start" onchange="updateReports()">
+                    <span>to</span>
+                    <input type="date" id="custom-end" onchange="updateReports()">
+                    <button class="btn" onclick="showExportModal()">
+                        <i class="fas fa-download"></i> Export Report
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Key Metrics -->
+            <div class="metrics-cards">
+                <div class="metric-card">
+                    <div class="metric-icon active">
+                        <i class="fas fa-link"></i>
+                    </div>
+                    <h3 id="active-mentorships">48</h3>
+                    <p>Active Mentorship Records</p>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 12% from last month
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon sessions">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3 id="avg-sessions">6.2</h3>
+                    <p>Avg. Sessions per Assignment</p>
+                    <div class="metric-trend trend-neutral">
+                        <i class="fas fa-minus"></i> No change
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon rating">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3 id="avg-feedback">4.7</h3>
+                    <p>Avg. Feedback Score</p>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 5% from last quarter
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon completion">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h3 id="completion-rate">87%</h3>
+                    <p>Program Completion Rate</p>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-arrow-up"></i> 8% from last year
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts Section -->
+            <div class="charts-grid">
+                <!-- Mentorship Activity Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h4>Mentorship Activity Trends</h4>
+                        <select id="activity-period" onchange="updateActivityChart()" style="padding: 5px 10px; border-radius: var(--radius); border: 1px solid #ddd;">
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                    <div class="chart-legend">
+                        <div class="chart-legend-item">
+                            <div class="chart-color-dot" style="background-color: var(--secondary);"></div>
+                            <span>New Mentorships</span>
+                        </div>
+                        <div class="chart-legend-item">
+                            <div class="chart-color-dot" style="background-color: var(--success);"></div>
+                            <span>Completed Sessions</span>
+                        </div>
+                        <div class="chart-legend-item">
+                            <div class="chart-color-dot" style="background-color: var(--warning);"></div>
+                            <span>Active Students</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Program Performance Chart -->
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h4>Program Performance Comparison</h4>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="programChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Reports Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h3>Detailed Reports</h3>
+                    <button class="btn btn-info" onclick="refreshReports()">
+                        <i class="fas fa-sync-alt"></i> Refresh Data
+                    </button>
+                </div>
+                
+                <div class="reports-grid">
+                    <!-- Sessions per Program Report -->
+                    <div class="report-card">
+                        <h4>Average Sessions per Program</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Program</th>
+                                    <th>Avg. Sessions</th>
+                                    <th>Total Assignments</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sessions-table">
+                                <!-- Data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Feedback Scores Report -->
+                    <div class="report-card">
+                        <h4>Feedback Scores by Program</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Program</th>
+                                    <th>Avg. Score</th>
+                                    <th>Responses</th>
+                                </tr>
+                            </thead>
+                            <tbody id="feedback-table">
+                                <!-- Data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Mentor Performance Report -->
+                    <div class="report-card">
+                        <h4>Top Performing Mentors</h4>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Mentor</th>
+                                    <th>Avg. Rating</th>
+                                    <th>Sessions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mentors-table">
+                                <!-- Data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Program Completion Report - FIXED -->
+                    <div class="report-card">
+                        <h4>Program Completion Rates</h4>
+                        <table class="compact-table">
+                            <thead>
+                                <tr>
+                                    <th>Program</th>
+                                    <th>Started</th>
+                                    <th>Completed</th>
+                                    <th>Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody id="completion-table">
+                                <!-- Data will be populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Monthly Trends Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h3>Monthly Performance Trends</h3>
+                    <select id="trend-metric" onchange="updateTrendTable()" style="padding: 8px 12px; border-radius: var(--radius); border: 1px solid #ddd;">
+                        <option value="sessions">Session Activity</option>
+                        <option value="feedback">Feedback Scores</option>
+                        <option value="enrollment">New Enrollments</option>
+                        <option value="completion">Completions</option>
+                    </select>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table style="min-width: 600px;">
+                        <thead>
+                            <tr>
+                                <th>Month</th>
+                                <th>Tech Mentorship</th>
+                                <th>Leadership Program</th>
+                                <th>Career Development</th>
+                                <th>Business Strategy</th>
+                                <th>Overall</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trends-table">
+                            <!-- Data will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Additional Chart: Feedback Trends -->
+            <div class="section">
+                <div class="section-header">
+                    <h3>Feedback Score Trends Over Time</h3>
+                    <select id="feedback-program" onchange="updateFeedbackChart()" style="padding: 8px 12px; border-radius: var(--radius); border: 1px solid #ddd;">
+                        <option value="all">All Programs</option>
+                        <option value="tech">Tech Mentorship</option>
+                        <option value="leadership">Leadership Program</option>
+                        <option value="career">Career Development</option>
+                        <option value="business">Business Strategy</option>
+                    </select>
+                </div>
+                <div class="chart-wrapper" style="height: 250px;">
+                    <canvas id="feedbackChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="footer">
+                <p>Student Mentorship Program System © 2025</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Logout Modal -->
+    <div class="modal-overlay" id="logout-modal">
+        <div class="logout-modal">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <h3>Confirm Logout</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to logout from the Mentorship Management System?</p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancel-logout">Cancel</button>
+                <button class="modal-btn logout" id="confirm-logout">Logout</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Export Modal -->
+    <div class="modal-overlay" id="export-modal">
+        <div class="export-modal">
+            <div class="modal-header">
+                <div class="modal-icon" style="background-color: #e8f4fd; color: var(--secondary);">
+                    <i class="fas fa-download"></i>
+                </div>
+                <h3>Export Report</h3>
+                <button class="modal-close-btn" onclick="closeExportModal()" style="margin-left: auto;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Select the format and data range for your report export:</p>
+                
+                <div class="export-options">
+                    <div class="export-option" onclick="selectExportFormat('pdf')" id="pdf-option">
+                        <i class="fas fa-file-pdf"></i>
+                        <h4>PDF Report</h4>
+                        <p>Formatted document suitable for printing and sharing</p>
+                    </div>
+                    <div class="export-option" onclick="selectExportFormat('excel')" id="excel-option">
+                        <i class="fas fa-file-excel"></i>
+                        <h4>Excel Spreadsheet</h4>
+                        <p>Raw data for further analysis in spreadsheet software</p>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Data Range</label>
+                    <select id="export-range" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: var(--radius);">
+                        <option value="current">Current View</option>
+                        <option value="month">This Month</option>
+                        <option value="quarter">This Quarter</option>
+                        <option value="year">This Year</option>
+                        <option value="all">All Time</option>
+                        <option value="custom">Custom Range</option>
+                    </select>
+                </div>
+                
+                <div id="custom-range-fields" style="margin-top: 15px; display: none;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-size: 0.9rem;">Start Date</label>
+                            <input type="date" id="export-start" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: var(--radius);">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 5px; font-size: 0.9rem;">End Date</label>
+                            <input type="date" id="export-end" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: var(--radius);">
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Include Sections</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <input type="checkbox" id="include-metrics" checked>
+                            <label for="include-metrics">Key Metrics</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="include-charts" checked>
+                            <label for="include-charts">Charts</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="include-tables" checked>
+                            <label for="include-tables">Detailed Tables</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="include-trends" checked>
+                            <label for="include-trends">Trend Analysis</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeExportModal()">Cancel</button>
+                <button class="modal-btn logout" onclick="exportReport()" style="background-color: var(--success);">
+                    Export Report
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sample reports data
+        const reportsData = {
+            activeMentorships: 48,
+            avgSessionsPerAssignment: 6.2,
+            avgFeedbackScore: 4.7,
+            completionRate: 87,
+            
+            sessionsPerProgram: [
+                { program: "Tech Mentorship", avgSessions: 7.3, totalAssignments: 15 },
+                { program: "Leadership Program", avgSessions: 5.8, totalAssignments: 12 },
+                { program: "Career Development", avgSessions: 6.5, totalAssignments: 10 },
+                { program: "Business Strategy", avgSessions: 4.9, totalAssignments: 8 },
+                { program: "Public Speaking", avgSessions: 5.2, totalAssignments: 6 }
+            ],
+            
+            feedbackScores: [
+                { program: "Tech Mentorship", avgScore: 4.8, responses: 42 },
+                { program: "Leadership Program", avgScore: 4.6, responses: 38 },
+                { program: "Career Development", avgScore: 4.9, responses: 32 },
+                { program: "Business Strategy", avgScore: 4.5, responses: 25 },
+                { program: "Public Speaking", avgScore: 4.7, responses: 18 }
+            ],
+            
+            topMentors: [
+                { name: "Sarah Johnson", avgRating: 4.9, sessions: 42 },
+                { name: "Michael Chen", avgRating: 4.8, sessions: 38 },
+                { name: "Jennifer Lee", avgRating: 4.7, sessions: 35 },
+                { name: "Robert Williams", avgRating: 4.7, sessions: 28 },
+                { name: "Amanda Davis", avgRating: 4.6, sessions: 25 }
+            ],
+            
+            completionRates: [
+                { program: "Tech Mentorship", started: 65, completed: 58, rate: 89 },
+                { program: "Leadership Program", started: 52, completed: 45, rate: 87 },
+                { program: "Career Development", started: 48, completed: 42, rate: 88 },
+                { program: "Business Strategy", started: 35, completed: 30, rate: 86 },
+                { program: "Public Speaking", started: 28, completed: 25, rate: 89 }
+            ],
+            
+            monthlyTrends: {
+                sessions: [
+                    { month: "Jan", tech: 45, leadership: 32, career: 28, business: 18, overall: 123 },
+                    { month: "Feb", tech: 48, leadership: 35, career: 30, business: 20, overall: 133 },
+                    { month: "Mar", tech: 52, leadership: 38, career: 32, business: 22, overall: 144 },
+                    { month: "Apr", tech: 55, leadership: 40, career: 35, business: 25, overall: 155 },
+                    { month: "May", tech: 58, leadership: 42, career: 38, business: 28, overall: 166 },
+                    { month: "Jun", tech: 62, leadership: 45, career: 40, business: 30, overall: 177 }
+                ],
+                feedback: [
+                    { month: "Jan", tech: 4.7, leadership: 4.5, career: 4.8, business: 4.4, overall: 4.6 },
+                    { month: "Feb", tech: 4.7, leadership: 4.6, career: 4.8, business: 4.4, overall: 4.6 },
+                    { month: "Mar", tech: 4.8, leadership: 4.6, career: 4.9, business: 4.5, overall: 4.7 },
+                    { month: "Apr", tech: 4.8, leadership: 4.6, career: 4.9, business: 4.5, overall: 4.7 },
+                    { month: "May", tech: 4.8, leadership: 4.7, career: 4.9, business: 4.5, overall: 4.7 },
+                    { month: "Jun", tech: 4.9, leadership: 4.7, career: 4.9, business: 4.6, overall: 4.8 }
+                ]
+            }
+        };
+
+        // Chart instances
+        let activityChart, programChart, feedbackChart;
+
+        // State variables
+        let selectedExportFormat = 'pdf';
+        let currentTimePeriod = 'quarter';
+
+        // Initialize the reports page
+        function initReports() {
+            updateKeyMetrics();
+            renderReportsTables();
+            renderTrendsTable();
+            setupDateFilters();
+            createCharts();
+            
+            // Set default dates for custom range
+            const today = new Date();
+            const firstDay = new Date(today.getFullYear(), today.getMonth(), 1);
+            
+            document.getElementById('custom-start').value = firstDay.toISOString().split('T')[0];
+            document.getElementById('custom-end').value = today.toISOString().split('T')[0];
+        }
+
+        // Create all charts
+        function createCharts() {
+            createActivityChart();
+            createProgramChart();
+            createFeedbackChart();
+        }
+
+        // Create Activity Chart
+        function createActivityChart() {
+            const ctx = document.getElementById('activityChart').getContext('2d');
+            
+            // Dummy data for activity chart
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+            const newMentorships = [12, 15, 18, 14, 16, 20];
+            const completedSessions = [85, 92, 88, 95, 102, 110];
+            const activeStudents = [45, 48, 52, 55, 58, 62];
+            
+            activityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'New Mentorships',
+                            data: newMentorships,
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Completed Sessions',
+                            data: completedSessions,
+                            borderColor: '#27ae60',
+                            backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Active Students',
+                            data: activeStudents,
+                            borderColor: '#f39c12',
+                            backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#666'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#666'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create Program Performance Chart
+        function createProgramChart() {
+            const ctx = document.getElementById('programChart').getContext('2d');
+            
+            // Dummy data for program performance
+            const programs = ['Tech Mentorship', 'Leadership Program', 'Career Development', 'Business Strategy', 'Public Speaking'];
+            const feedbackScores = [4.8, 4.6, 4.9, 4.5, 4.7];
+            const colors = ['#3498db', '#27ae60', '#f39c12', '#9b59b6', '#e74c3c'];
+            
+            programChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: programs,
+                    datasets: [{
+                        label: 'Average Feedback Score',
+                        data: feedbackScores,
+                        backgroundColor: colors,
+                        borderColor: colors.map(color => color.replace('0.8', '1')),
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Score: ${context.raw}/5.0`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 5,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#666',
+                                callback: function(value) {
+                                    return value + '.0';
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#666',
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Create Feedback Trends Chart
+        function createFeedbackChart() {
+            const ctx = document.getElementById('feedbackChart').getContext('2d');
+            
+            // Dummy data for feedback trends
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+            const techScores = [4.7, 4.7, 4.8, 4.8, 4.8, 4.9];
+            const leadershipScores = [4.5, 4.6, 4.6, 4.6, 4.7, 4.7];
+            const careerScores = [4.8, 4.8, 4.9, 4.9, 4.9, 4.9];
+            const businessScores = [4.4, 4.4, 4.5, 4.5, 4.5, 4.6];
+            
+            feedbackChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Tech Mentorship',
+                            data: techScores,
+                            borderColor: '#3498db',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Leadership Program',
+                            data: leadershipScores,
+                            borderColor: '#27ae60',
+                            backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Career Development',
+                            data: careerScores,
+                            borderColor: '#f39c12',
+                            backgroundColor: 'rgba(243, 156, 18, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Business Strategy',
+                            data: businessScores,
+                            borderColor: '#9b59b6',
+                            backgroundColor: 'rgba(155, 89, 182, 0.1)',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 5,
+                            grid: {
+                                drawBorder: false
+                            },
+                            ticks: {
+                                color: '#666',
+                                callback: function(value) {
+                                    return value.toFixed(1);
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#666'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update activity chart based on selected period
+        function updateActivityChart() {
+            const period = document.getElementById('activity-period').value;
+            
+            // Update chart data based on period
+            let labels, newMentorships, completedSessions, activeStudents;
+            
+            switch(period) {
+                case 'monthly':
+                    labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                    newMentorships = [4, 5, 6, 5];
+                    completedSessions = [28, 32, 30, 35];
+                    activeStudents = [58, 60, 62, 62];
+                    break;
+                case 'quarterly':
+                    labels = ['Q1', 'Q2', 'Q3', 'Q4'];
+                    newMentorships = [45, 52, 58, 62];
+                    completedSessions = [265, 295, 310, 330];
+                    activeStudents = [145, 155, 162, 170];
+                    break;
+                case 'yearly':
+                    labels = ['2020', '2021', '2022', '2023'];
+                    newMentorships = [180, 195, 210, 225];
+                    completedSessions = [980, 1120, 1250, 1350];
+                    activeStudents = [450, 520, 580, 650];
+                    break;
+            }
+            
+            activityChart.data.labels = labels;
+            activityChart.data.datasets[0].data = newMentorships;
+            activityChart.data.datasets[1].data = completedSessions;
+            activityChart.data.datasets[2].data = activeStudents;
+            activityChart.update();
+            
+            showNotification(`Activity chart updated to show ${period} data`, 'info');
+        }
+
+        // Update feedback chart based on selected program
+        function updateFeedbackChart() {
+            const program = document.getElementById('feedback-program').value;
+            
+            // Update chart visibility based on selected program
+            const datasets = feedbackChart.data.datasets;
+            
+            datasets.forEach((dataset, index) => {
+                dataset.hidden = program !== 'all' && !dataset.label.toLowerCase().includes(program);
+            });
+            
+            feedbackChart.update();
+            
+            if (program === 'all') {
+                showNotification('Showing feedback trends for all programs', 'info');
+            } else {
+                const programName = datasets.find(d => d.label.toLowerCase().includes(program)).label;
+                showNotification(`Showing feedback trends for ${programName}`, 'info');
+            }
+        }
+
+        // Update key metrics display
+        function updateKeyMetrics() {
+            document.getElementById('active-mentorships').textContent = reportsData.activeMentorships;
+            document.getElementById('avg-sessions').textContent = reportsData.avgSessionsPerAssignment.toFixed(1);
+            document.getElementById('avg-feedback').textContent = reportsData.avgFeedbackScore.toFixed(1);
+            document.getElementById('completion-rate').textContent = `${reportsData.completionRate}%`;
+        }
+
+        // Render reports tables
+        function renderReportsTables() {
+            // Sessions per program table
+            const sessionsTable = document.getElementById('sessions-table');
+            sessionsTable.innerHTML = '';
+            
+            reportsData.sessionsPerProgram.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.program}</td>
+                    <td>${item.avgSessions.toFixed(1)}</td>
+                    <td>${item.totalAssignments}</td>
+                `;
+                sessionsTable.appendChild(row);
+            });
+            
+            // Feedback scores table
+            const feedbackTable = document.getElementById('feedback-table');
+            feedbackTable.innerHTML = '';
+            
+            reportsData.feedbackScores.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.program}</td>
+                    <td>
+                        <div style="display: flex; align-items: center;">
+                            <span>${item.avgScore.toFixed(1)}</span>
+                            <div class="rating-stars" style="margin-left: 10px;">
+                                ${getStarRating(item.avgScore)}
+                            </div>
+                        </div>
+                    </td>
+                    <td>${item.responses}</td>
+                `;
+                feedbackTable.appendChild(row);
+            });
+            
+            // Top mentors table
+            const mentorsTable = document.getElementById('mentors-table');
+            mentorsTable.innerHTML = '';
+            
+            reportsData.topMentors.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name}</td>
+                    <td>
+                        <div style="display: flex; align-items: center;">
+                            <span>${item.avgRating.toFixed(1)}</span>
+                            <div class="rating-stars" style="margin-left: 10px;">
+                                ${getStarRating(item.avgRating)}
+                            </div>
+                        </div>
+                    </td>
+                    <td>${item.sessions}</td>
+                `;
+                mentorsTable.appendChild(row);
+            });
+            
+            // Completion rates table - FIXED VERSION
+            const completionTable = document.getElementById('completion-table');
+            completionTable.innerHTML = '';
+            
+            reportsData.completionRates.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.program}</td>
+                    <td>${item.started}</td>
+                    <td>${item.completed}</td>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span style="font-weight: 600; color: ${getProgressColor(item.rate)}; min-width: 35px;">${item.rate}%</span>
+                            <div class="progress-bar" style="flex: 1;">
+                                <div class="progress-fill" style="width: ${item.rate}%; background-color: ${getProgressColor(item.rate)};"></div>
+                            </div>
+                        </div>
+                    </td>
+                `;
+                completionTable.appendChild(row);
+            });
+        }
+
+        // Render trends table
+        function renderTrendsTable() {
+            const trendsTable = document.getElementById('trends-table');
+            const metric = document.getElementById('trend-metric').value;
+            const trendData = reportsData.monthlyTrends[metric];
+            
+            trendsTable.innerHTML = '';
+            
+            trendData.forEach(item => {
+                const row = document.createElement('tr');
+                
+                if (metric === 'feedback') {
+                    row.innerHTML = `
+                        <td>${item.month}</td>
+                        <td>${item.tech.toFixed(1)}</td>
+                        <td>${item.leadership.toFixed(1)}</td>
+                        <td>${item.career.toFixed(1)}</td>
+                        <td>${item.business.toFixed(1)}</td>
+                        <td>${item.overall.toFixed(1)}</td>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <td>${item.month}</td>
+                        <td>${item.tech}</td>
+                        <td>${item.leadership}</td>
+                        <td>${item.career}</td>
+                        <td>${item.business}</td>
+                        <td>${item.overall}</td>
+                    `;
+                }
+                
+                trendsTable.appendChild(row);
+            });
+        }
+
+        // Update trends table when metric changes
+        function updateTrendTable() {
+            renderTrendsTable();
+        }
+
+        // Get star rating HTML
+        function getStarRating(score) {
+            let stars = '';
+            const fullStars = Math.floor(score);
+            const hasHalfStar = score % 1 >= 0.5;
+            
+            for (let i = 0; i < fullStars; i++) {
+                stars += '<i class="fas fa-star"></i>';
+            }
+            
+            if (hasHalfStar) {
+                stars += '<i class="fas fa-star-half-alt"></i>';
+            }
+            
+            const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+            for (let i = 0; i < emptyStars; i++) {
+                stars += '<i class="far fa-star"></i>';
+            }
+            
+            return stars;
+        }
+
+        // Get progress bar color based on value
+        function getProgressColor(value) {
+            if (value >= 90) return '#27ae60';
+            if (value >= 80) return '#f39c12';
+            if (value >= 70) return '#e67e22';
+            return '#e74c3c';
+        }
+
+        // Setup date filters
+        function setupDateFilters() {
+            const today = new Date();
+            const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            const firstDayOfQuarter = new Date(today.getFullYear(), Math.floor(today.getMonth() / 3) * 3, 1);
+            const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
+            
+            // Set default values
+            document.getElementById('custom-start').value = firstDayOfQuarter.toISOString().split('T')[0];
+            document.getElementById('custom-end').value = today.toISOString().split('T')[0];
+            
+            // Handle time period changes
+            document.getElementById('time-period').addEventListener('change', function() {
+                currentTimePeriod = this.value;
+                
+                let startDate;
+                switch(currentTimePeriod) {
+                    case 'month':
+                        startDate = firstDayOfMonth;
+                        break;
+                    case 'quarter':
+                        startDate = firstDayOfQuarter;
+                        break;
+                    case 'year':
+                        startDate = firstDayOfYear;
+                        break;
+                    case 'all':
+                        startDate = new Date('2023-01-01');
+                        break;
+                    default:
+                        startDate = firstDayOfQuarter;
+                }
+                
+                if (currentTimePeriod !== 'custom') {
+                    document.getElementById('custom-start').value = startDate.toISOString().split('T')[0];
+                    document.getElementById('custom-end').value = today.toISOString().split('T')[0];
+                }
+                
+                updateReports();
+            });
+        }
+
+        // Update reports based on filters
+        function updateReports() {
+            const startDate = document.getElementById('custom-start').value;
+            const endDate = document.getElementById('custom-end').value;
+            
+            // In a real application, this would fetch new data based on the date range
+            // For this demo, we'll just update the charts with new dummy data
+            updateChartsWithDateRange(startDate, endDate);
+            
+            showNotification(`Reports updated for ${startDate} to ${endDate}`, 'info');
+            
+            // Update the "last updated" time
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+            document.querySelector('.reports-header p').textContent = `Last updated: Today, ${timeString}`;
+        }
+
+        // Update charts with new date range
+        function updateChartsWithDateRange(startDate, endDate) {
+            // Calculate months between dates
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const monthDiff = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+            
+            // Generate labels based on date range
+            let labels = [];
+            let currentDate = new Date(start);
+            
+            for (let i = 0; i <= monthDiff; i++) {
+                labels.push(currentDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' }));
+                currentDate.setMonth(currentDate.getMonth() + 1);
+            }
+            
+            // Update activity chart with new data
+            if (activityChart) {
+                const newMentorships = generateRandomData(labels.length, 10, 20);
+                const completedSessions = generateRandomData(labels.length, 80, 120);
+                const activeStudents = generateRandomData(labels.length, 40, 70);
+                
+                activityChart.data.labels = labels;
+                activityChart.data.datasets[0].data = newMentorships;
+                activityChart.data.datasets[1].data = completedSessions;
+                activityChart.data.datasets[2].data = activeStudents;
+                activityChart.update();
+            }
+        }
+
+        // Generate random data for charts
+        function generateRandomData(count, min, max) {
+            const data = [];
+            for (let i = 0; i < count; i++) {
+                data.push(Math.floor(Math.random() * (max - min + 1)) + min);
+            }
+            return data;
+        }
+
+        // Refresh reports data
+        function refreshReports() {
+            // Simulate data refresh
+            showNotification('Refreshing report data...', 'info');
+            
+            // In a real app, this would fetch fresh data from the server
+            setTimeout(() => {
+                // Update metrics with slight variations to simulate fresh data
+                reportsData.activeMentorships = 48 + Math.floor(Math.random() * 5) - 2;
+                reportsData.avgSessionsPerAssignment = 6.2 + (Math.random() * 0.4 - 0.2);
+                reportsData.avgFeedbackScore = 4.7 + (Math.random() * 0.1 - 0.05);
+                reportsData.completionRate = 87 + Math.floor(Math.random() * 3) - 1;
+                
+                updateKeyMetrics();
+                updateChartsWithFreshData();
+                showNotification('Report data refreshed successfully!', 'success');
+            }, 1000);
+        }
+
+        // Update charts with fresh data
+        function updateChartsWithFreshData() {
+            // Update program chart with slightly varied data
+            if (programChart) {
+                const newScores = programChart.data.datasets[0].data.map(score => {
+                    const variation = (Math.random() * 0.2 - 0.1);
+                    return Math.min(5, Math.max(4, score + variation));
+                });
+                programChart.data.datasets[0].data = newScores;
+                programChart.update();
+            }
+            
+            // Update feedback chart with slightly varied data
+            if (feedbackChart) {
+                feedbackChart.data.datasets.forEach(dataset => {
+                    const newData = dataset.data.map(score => {
+                        const variation = (Math.random() * 0.15 - 0.075);
+                        return Math.min(5, Math.max(4.3, score + variation));
+                    });
+                    dataset.data = newData;
+                });
+                feedbackChart.update();
+            }
+        }
+
+        // Show export modal
+        function showExportModal() {
+            selectedExportFormat = 'pdf';
+            document.getElementById('pdf-option').classList.add('selected');
+            document.getElementById('excel-option').classList.remove('selected');
+            
+            document.getElementById('export-modal').classList.add('active');
+        }
+
+        // Close export modal
+        function closeExportModal() {
+            document.getElementById('export-modal').classList.remove('active');
+        }
+
+        // Select export format
+        function selectExportFormat(format) {
+            selectedExportFormat = format;
+            
+            // Update UI
+            document.getElementById('pdf-option').classList.toggle('selected', format === 'pdf');
+            document.getElementById('excel-option').classList.toggle('selected', format === 'excel');
+            
+            // Show/hide custom range fields
+            const exportRange = document.getElementById('export-range').value;
+            const customRangeFields = document.getElementById('custom-range-fields');
+            customRangeFields.style.display = exportRange === 'custom' ? 'block' : 'none';
+        }
+
+        // Handle export range change
+        document.getElementById('export-range').addEventListener('change', function() {
+            const customRangeFields = document.getElementById('custom-range-fields');
+            customRangeFields.style.display = this.value === 'custom' ? 'block' : 'none';
+        });
+
+        // Export report
+        function exportReport() {
+            const format = selectedExportFormat;
+            const range = document.getElementById('export-range').value;
+            const includeMetrics = document.getElementById('include-metrics').checked;
+            const includeCharts = document.getElementById('include-charts').checked;
+            const includeTables = document.getElementById('include-tables').checked;
+            const includeTrends = document.getElementById('include-trends').checked;
+            
+            // Validate custom range if selected
+            if (range === 'custom') {
+                const startDate = document.getElementById('export-start').value;
+                const endDate = document.getElementById('export-end').value;
+                
+                if (!startDate || !endDate) {
+                    alert('Please select both start and end dates for custom range.');
+                    return;
+                }
+                
+                if (new Date(startDate) > new Date(endDate)) {
+                    alert('Start date cannot be after end date.');
+                    return;
+                }
+            }
+            
+            // Simulate export process
+            showNotification(`Exporting ${format.toUpperCase()} report...`, 'info');
+            
+            setTimeout(() => {
+                closeExportModal();
+                showNotification(`${format.toUpperCase()} report exported successfully!`, 'success');
+                
+                // In a real application, this would trigger a file download
+                // For this demo, we'll just log what would happen
+                console.log(`Exporting ${format} report with:
+                - Range: ${range}
+                - Includes: Metrics: ${includeMetrics}, Charts: ${includeCharts}, Tables: ${includeTables}, Trends: ${includeTrends}`);
+            }, 1500);
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'notification-item unread';
+            notification.style.position = 'fixed';
+            notification.style.top = '80px';
+            notification.style.right = '30px';
+            notification.style.width = '300px';
+            notification.style.zIndex = '1000';
+            notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            
+            let iconClass = 'info';
+            let icon = 'info-circle';
+            
+            if (type === 'success') {
+                iconClass = 'success';
+                icon = 'check-circle';
+            } else if (type === 'warning') {
+                iconClass = 'warning';
+                icon = 'exclamation-triangle';
+            } else if (type === 'error') {
+                iconClass = 'error';
+                icon = 'times-circle';
+            }
+            
+            notification.innerHTML = `
+                <div class="notification-icon ${iconClass}">
+                    <i class="fas fa-${icon}"></i>
+                </div>
+                <div class="notification-details">
+                    <h4>${type.charAt(0).toUpperCase() + type.slice(1)}</h4>
+                    <p>${message}</p>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 5000);
+        }
+
+        // Notifications functionality
+        document.getElementById('notifications').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const popup = document.getElementById('notifications-popup');
+            popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+        });
+
+        function closeNotifications() {
+            document.getElementById('notifications-popup').style.display = 'none';
+        }
+
+        function markAllAsRead() {
+            const unreadItems = document.querySelectorAll('.notification-item.unread');
+            unreadItems.forEach(item => {
+                item.classList.remove('unread');
+            });
+            document.querySelector('.notification-badge').textContent = '0';
+            closeNotifications();
+        }
+
+        // Close notifications when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#notifications-popup') && !e.target.closest('#notifications')) {
+                closeNotifications();
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            document.getElementById('logout-modal').classList.add('active');
+        });
+
+        document.getElementById('cancel-logout').addEventListener('click', function() {
+            document.getElementById('logout-modal').classList.remove('active');
+        });
+
+        document.getElementById('confirm-logout').addEventListener('click', function() {
+            alert('You have been logged out successfully!');
+            document.getElementById('logout-modal').classList.remove('active');
+        });
+
+        // Initialize reports when page loads
+        document.addEventListener('DOMContentLoaded', initReports);
+    </script>
+</body>
+</html>

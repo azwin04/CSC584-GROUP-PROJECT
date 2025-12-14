@@ -1,0 +1,1563 @@
+<!doctype html>
+<!--
+    @Title: Student Portal - Profile
+    @Author: Aisya
+-->
+<html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <title>Student Portal - Profile</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+      <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --info: #17a2b8;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary);
+            color: white;
+            padding: 25px 0;
+            box-shadow: var(--shadow);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo-area h1 {
+            font-size: 1.5rem;
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .logo-icon {
+            background-color: var(--secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 5px;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .nav-links i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--accent);
+        }
+
+        .logout-btn i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .user-info {
+            position: absolute;
+            bottom: 80px;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 12px;
+        }
+
+        .user-details h4 {
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+        }
+
+        .user-details p {
+            font-size: 0.8rem;
+            color: #bbb;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 30px;
+            /*max-width: 800px;*/
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .header h2 i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+
+        .notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        /* Notification Popup Styles */
+        .notifications-popup {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 400px;
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notifications-popup-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notifications-popup-header h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+
+        .modal-close-btn:hover {
+            color: var(--accent);
+        }
+
+        .notifications-popup-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            align-items: flex-start;
+            transition: background-color 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .notification-item.unread {
+            background-color: #f0f7ff;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .notification-icon.success {
+            background-color: #e7f7ef;
+            color: var(--success);
+        }
+
+        .notification-icon.warning {
+            background-color: #fef9e7;
+            color: #f39c12;
+        }
+
+        .notification-icon.info {
+            background-color: #e8f4fd;
+            color: var(--secondary);
+        }
+
+        .notification-icon.error {
+            background-color: #fdedec;
+            color: var(--accent);
+        }
+
+        .notification-details h4 {
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .notification-details p {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .notifications-popup-footer {
+            padding: 15px 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+
+        .mark-all-read {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .mark-all-read:hover {
+            text-decoration: underline;
+        }
+
+        /* Notification dropdown arrow */
+        .notifications-popup::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid white;
+        }
+
+        .profile-card {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 25px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: white;
+            font-weight: bold;
+            margin-right: 25px;
+            border: 4px solid white;
+            box-shadow: var(--shadow);
+        }
+
+        .profile-info h3 {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .profile-info p {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-info p i {
+            margin-right: 8px;
+            color: var(--secondary);
+            width: 20px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section-title h3 {
+            color: var(--primary);
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 10px;
+            color: var(--secondary);
+        }
+
+        .info-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-label i {
+            margin-right: 8px;
+            color: var(--secondary);
+            width: 18px;
+        }
+
+        .info-value {
+            color: #555;
+            font-size: 1rem;
+            padding-left: 26px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+        }
+
+        .form-group label i {
+            margin-right: 8px;
+            color: var(--secondary);
+            width: 18px;
+        }
+
+        .form-control {
+            width: 100%;
+            max-width: 450px;
+            padding: 12px 14px;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            background-color: white;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-help {
+            font-size: 0.85rem;
+            color: #777;
+            margin-top: 6px;
+            margin-left: 26px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-secondary {
+            background-color: #ecf0f1;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background-color: #d5dbdb;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-success:hover {
+            background-color: #219653;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: var(--radius);
+            width: 95%;
+            max-width: 500px;
+            animation: slideIn 0.3s ease;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            justify-content: space-between;
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #e8f4fd;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin-right: 15px;
+        }
+
+        .modal-header h3 {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .modal-body {
+            margin-bottom: 25px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            padding: 10px 24px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+
+        .modal-btn.cancel {
+            background-color: #ecf0f1;
+            color: #333;
+        }
+
+        .modal-btn.cancel:hover {
+            background-color: #d5dbdb;
+        }
+
+        .modal-btn.confirm {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .modal-btn.confirm:hover {
+            background-color: #219653;
+        }
+
+        /* Success Modal */
+        .success-modal-body {
+            text-align: center;
+        }
+
+        .success-modal-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+
+        .modal-success {
+            color: var(--success);
+        }
+
+        .modal-warning {
+            color: #f39c12;
+        }
+
+        .modal-error {
+            color: var(--accent);
+        }
+
+        .modal-message {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .success-modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .modal-close {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
+
+        .logout-modal {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: var(--radius);
+            width: 95%;
+            max-width: 400px;
+            animation: slideIn 0.3s ease;
+            position: relative;
+        }
+
+        .logout-modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .logout-modal-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ffeaea;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .logout-modal-title {
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .logout-modal-body {
+            margin-bottom: 25px;
+        }
+
+        .logout-modal-body p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .logout-modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .logout-modal-btn {
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-modal-btn.cancel {
+            background-color: #ecf0f1;
+            color: #333;
+        }
+
+        .logout-modal-btn.cancel:hover {
+            background-color: #d5dbdb;
+        }
+
+        .logout-modal-btn.logout {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .logout-modal-btn.logout:hover {
+            background-color: #c0392b;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+                padding-top: 25px;
+            }
+
+            .logo-area h1, .user-details, .nav-links a span, .logout-btn span {
+                display: none;
+            }
+
+            .logo-area {
+                justify-content: center;
+                padding: 0 0 25px;
+            }
+
+            .logo-icon {
+                margin: 0;
+            }
+
+            .nav-links {
+                padding: 0;
+            }
+
+            .nav-links a {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .nav-links i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+
+            .logout-btn {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .logout-btn i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+
+            .user-profile {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .user-avatar {
+                margin-right: 0;
+            }
+
+            .main-content {
+                margin-left: 70px;
+                padding: 20px;
+            }
+            
+            .notifications-popup {
+                width: 300px;
+                right: -50px;
+            }
+            
+            .notifications-popup::before {
+                right: 50px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .profile-avatar {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+
+            .info-display {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+
+            .logout-modal-actions {
+                flex-direction: column;
+            }
+
+            .logout-modal-btn {
+                width: 100%;
+            }
+            
+            .notifications-popup {
+                width: 300px;
+                right: -70px;
+            }
+            
+            .notifications-popup::before {
+                right: 70px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 20px 15px;
+            }
+
+            .profile-card {
+                padding: 20px 15px;
+            }
+
+            .header h2 {
+                font-size: 1.4rem;
+            }
+
+            .section-title h3 {
+                font-size: 1.2rem;
+            }
+            
+            .modal-content, .logout-modal {
+                padding: 20px;
+                margin: 10px auto;
+            }
+            
+            .notifications-popup {
+                width: 280px;
+                right: -100px;
+            }
+            
+            .notifications-popup::before {
+                right: 100px;
+            }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar">
+          <div class="logo-area">
+              <div class="logo-icon">
+                  <i class="fas fa-graduation-cap"></i>
+              </div>
+              <h1>Student Portal</h1>
+          </div>
+
+          <ul class="nav-links">
+              <li>
+                  <a href="studentDashboard.html">
+                      <i class="fas fa-tachometer-alt"></i>
+                      <span>Dashboard</span>
+                  </a>
+              </li>
+              <li>
+                  <a href="studentMentorship.html">
+                      <i class="fas fa-handshake"></i>
+                      <span>My Mentorship</span>
+                  </a>
+              </li>
+              <li>
+                  <a href="studentHistory.html">
+                      <i class="fas fa-history"></i>
+                      <span>My History</span>
+                  </a>
+              </li>
+              <li>
+                  <a href="studentProfile.html" class="active">
+                      <i class="fas fa-user-cog"></i>
+                      <span>My Profile</span>
+                  </a>
+              </li>
+              <li>
+                  <a href="studentEnrollment.html">
+                      <i class="fas fa-clipboard-list"></i>
+                      <span>New Enrollment</span>
+                  </a>
+              </li>
+          </ul>
+
+          <div class="user-info">
+              <div class="user-profile">
+                  <div class="user-avatar">NA</div>
+                  <div class="user-details">
+                      <h4>Nur Aisya</h4>
+                      <p>Computer Science</p>
+                  </div>
+              </div>
+              
+              <button class="logout-btn" id="logoutBtn">
+                  <i class="fas fa-sign-out-alt"></i>
+                  <span>Logout</span>
+              </button>
+          </div>
+        </div>
+        
+        <div class="main-content">
+          <div class="header">
+              <h2><i class="fas fa-user-circle"></i> My Profile</h2>
+              <div class="notifications" onclick="toggleNotifications()">
+                  <i class="fas fa-bell fa-lg"></i>
+                  <div class="notification-badge">3</div>
+                  
+                  <!-- Notifications Popup -->
+                  <div class="notifications-popup" id="notificationsPopup">
+                      <div class="notifications-popup-header">
+                          <h3>Notifications</h3>
+                          <button class="modal-close-btn" onclick="closeNotifications()">&times;</button>
+                      </div>
+                      <div class="notifications-popup-content">
+                          <div class="notification-item unread">
+                              <div class="notification-icon warning">
+                                  <i class="fas fa-user-edit"></i>
+                              </div>
+                              <div class="notification-details">
+                                  <h4>Profile Update</h4>
+                                  <p>Your profile information is 80% complete. Consider adding more details.</p>
+                                  <div class="notification-time">2 hours ago</div>
+                              </div>
+                          </div>
+                          <div class="notification-item unread">
+                              <div class="notification-icon info">
+                                  <i class="fas fa-info-circle"></i>
+                              </div>
+                              <div class="notification-details">
+                                  <h4>Academic Update</h4>
+                                  <p>Your semester information needs to be updated for next academic year.</p>
+                                  <div class="notification-time">1 day ago</div>
+                              </div>
+                          </div>
+                          <div class="notification-item unread">
+                              <div class="notification-icon success">
+                                  <i class="fas fa-check-circle"></i>
+                              </div>
+                              <div class="notification-details">
+                                  <h4>Profile Verified</h4>
+                                  <p>Your student profile has been verified by the administration.</p>
+                                  <div class="notification-time">2 days ago</div>
+                              </div>
+                          </div>
+                          <div class="notification-item">
+                              <div class="notification-icon info">
+                                  <i class="fas fa-graduation-cap"></i>
+                              </div>
+                              <div class="notification-details">
+                                  <h4>Academic Progress</h4>
+                                  <p>You have successfully completed 5 mentorship sessions this semester.</p>
+                                  <div class="notification-time">3 days ago</div>
+                              </div>
+                          </div>
+                          <div class="notification-item">
+                              <div class="notification-icon warning">
+                                  <i class="fas fa-calendar-check"></i>
+                              </div>
+                              <div class="notification-details">
+                                  <h4>Upcoming Session</h4>
+                                  <p>Reminder: You have a mentorship session scheduled for tomorrow.</p>
+                                  <div class="notification-time">4 days ago</div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="notifications-popup-footer">
+                          <button class="mark-all-read" onclick="markAllAsRead()">Mark All as Read</button>
+                      </div>
+                  </div>
+              </div>
+          </div>
+
+          <div class="profile-card">
+              <div class="profile-header">
+                  <div class="profile-avatar">NA</div>
+                  <div class="profile-info">
+                      <h3>Nur Aisya binti Afizi</h3>
+                      <p><i class="fas fa-envelope"></i> 2025185601@student.uitm.edu.my</p>
+                      <p><i class="fas fa-phone"></i> 017-5659263</p>
+                      <p><i class="fas fa-graduation-cap"></i> Computer Science</p>
+                  </div>
+              </div>
+
+              <div class="section-title">
+                  <h3><i class="fas fa-info-circle"></i> Personal Information</h3>
+              </div>
+
+              <div class="info-display">
+                  <div class="info-item">
+                      <div class="info-label">
+                          <i class="fas fa-id-card"></i> Student ID
+                      </div>
+                      <div class="info-value">2025185601</div>
+                  </div>
+                  
+                  <div class="info-item">
+                      <div class="info-label">
+                          <i class="fas fa-user"></i> Full Name
+                      </div>
+                      <div class="info-value">Nur Aisya binti Afizi</div>
+                  </div>
+                  
+                  <div class="info-item">
+                      <div class="info-label">
+                          <i class="fas fa-university"></i> Faculty
+                      </div>
+                      <div class="info-value">Faculty of Computer Sciences and Mathematics</div>
+                  </div>
+                  
+                  <div class="info-item">
+                      <div class="info-label">
+                          <i class="fas fa-book"></i> Program
+                      </div>
+                      <div class="info-value">CS266</div>
+                  </div>
+                  
+                  <div class="info-item">
+                      <div class="info-label">
+                          <i class="fas fa-calendar-alt"></i> Semester
+                      </div>
+                      <div class="info-value">1</div>
+                  </div>
+                  
+                  <div class="info-item">
+                      <div class="info-label">
+                          <i class="fas fa-calendar"></i> Academic Year
+                      </div>
+                      <div class="info-value">2024/2025</div>
+                  </div>
+              </div>
+          </div>
+
+          <div class="profile-card">
+              <div class="section-title">
+                  <h3><i class="fas fa-edit"></i> Edit Profile Information</h3>
+              </div>
+
+              <form id="profileForm">
+                  <div class="form-group">
+                      <label><i class="fas fa-user"></i> Full Name</label>
+                      <input type="text" class="form-control" value="Nur Aisya binti Afizi" id="fullName">
+                      <div class="form-help">Your full name as registered in the university system</div>
+                  </div>
+
+                  <div class="form-group">
+                      <label><i class="fas fa-envelope"></i> Email Address</label>
+                      <input type="email" class="form-control" value="2025185601@student.uitm.edu.my" id="email">
+                      <div class="form-help">Primary email for communications</div>
+                  </div>
+
+                  <div class="form-group">
+                      <label><i class="fas fa-phone"></i> Phone Number</label>
+                      <input type="text" class="form-control" value="017-5659263" id="phone">
+                      <div class="form-help">Contact number for emergency notifications</div>
+                  </div>
+
+                  <div class="form-group">
+                      <label><i class="fas fa-calendar-alt"></i> Current Semester</label>
+                      <input type="text" class="form-control" value="1" id="semester">
+                      <div class="form-help">Your current academic semester</div>
+                  </div>
+
+                  <div class="action-buttons">
+                      <button type="button" class="btn btn-secondary" id="resetBtn">
+                          <i class="fas fa-undo"></i> Reset Changes
+                      </button>
+                      <button type="submit" class="btn btn-success">
+                          <i class="fas fa-save"></i> Save Changes
+                      </button>
+                  </div>
+              </form>
+          </div>
+
+          <div class="profile-card">
+              <div class="section-title">
+                  <h3><i class="fas fa-cog"></i> Account Settings</h3>
+              </div>
+
+              <div class="action-buttons">
+                  <button type="button" class="btn btn-secondary" id="changePasswordBtn">
+                      <i class="fas fa-key"></i> Change Password
+                  </button>
+              </div>
+          </div>
+
+          <div class="footer">
+              <p>Student Mentorship Program System © 2025</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="successModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="successTitle">Success!</h2>
+                <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body success-modal-body">
+                <div class="success-modal-icon modal-success">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div id="successMessage" class="modal-message">
+                    Your profile has been updated successfully!
+                </div>
+                <div class="success-modal-buttons">
+                    <button class="modal-close" onclick="closeModal()">OK</button>
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fas fa-key"></i>
+                </div>
+                <h3>Change Password</h3>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Current Password</label>
+                    <input type="password" class="form-control" id="currentPassword" placeholder="Enter current password">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> New Password</label>
+                    <input type="password" class="form-control" id="newPassword" placeholder="Enter new password">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-lock"></i> Confirm New Password</label>
+                    <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm new password">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancelPassword">Cancel</button>
+                <button class="modal-btn confirm" id="updatePassword">Update Password</button>
+            </div>
+        </div>
+      </div>
+
+      <div id="logoutModal" class="modal">
+        <div class="logout-modal">
+            <div class="logout-modal-header">
+                <div class="logout-modal-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <h3 class="logout-modal-title">Confirm Logout</h3>
+            </div>
+            <div class="logout-modal-body">
+                <p>Are you sure you want to logout from the Student Portal?</p>
+                <p style="font-size: 0.9rem; color: #888; margin-top: 10px;">You will be redirected to the login page.</p>
+            </div>
+            <div class="logout-modal-actions">
+                <button class="logout-modal-btn cancel" id="cancelLogout">Cancel</button>
+                <button class="logout-modal-btn logout" id="confirmLogout">Logout</button>
+            </div>
+        </div>
+      </div>
+
+      <script>
+        function toggleNotifications() {
+            const popup = document.getElementById('notificationsPopup');
+            const isOpen = popup.style.display === 'block';
+            
+            closeAllModals();
+            
+            if (isOpen) {
+                closeNotifications();
+            } else {
+                openNotifications();
+            }
+        }
+
+        function openNotifications() {
+            const popup = document.getElementById('notificationsPopup');
+            popup.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeNotifications() {
+            const popup = document.getElementById('notificationsPopup');
+            popup.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function markAllAsRead() {
+            const notificationItems = document.querySelectorAll('.notification-item.unread');
+            notificationItems.forEach(item => {
+                item.classList.remove('unread');
+            });
+            
+            document.querySelector('.notification-badge').textContent = '0';
+            document.querySelector('.notification-badge').style.display = 'none';
+            
+            closeNotifications();
+        }
+
+        document.addEventListener('click', function(event) {
+            const notificationsPopup = document.getElementById('notificationsPopup');
+            const notificationsIcon = document.querySelector('.notifications');
+            
+            if (notificationsPopup.style.display === 'block' && 
+                !notificationsPopup.contains(event.target) && 
+                !notificationsIcon.contains(event.target)) {
+                closeNotifications();
+            }
+        });
+
+        const profileForm = document.getElementById('profileForm');
+        const resetBtn = document.getElementById('resetBtn');
+        
+        const originalValues = {
+            fullName: 'Nur Aisya binti Afizi',
+            email: '2025185601@student.uitm.edu.my',
+            phone: '017-5659263',
+            semester: '1'
+        };
+        
+        profileForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = {
+                fullName: document.getElementById('fullName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                semester: document.getElementById('semester').value
+            };
+            
+            const userAvatar = document.querySelector('.user-avatar');
+            const userName = document.querySelector('.user-details h4');
+            const profileAvatar = document.querySelector('.profile-avatar');
+            const profileName = document.querySelector('.profile-info h3');
+            const profileEmail = document.querySelector('.profile-info p:nth-child(2)');
+            const profilePhone = document.querySelector('.profile-info p:nth-child(3)');
+            
+            const initials = formData.fullName.split(' ')
+                .map(name => name[0])
+                .join('')
+                .toUpperCase();
+            
+            userAvatar.textContent = initials.substring(0, 2);
+            profileAvatar.textContent = initials.substring(0, 2);
+            profileName.textContent = formData.fullName;
+            profileEmail.innerHTML = `<i class="fas fa-envelope"></i> ${formData.email}`;
+            profilePhone.innerHTML = `<i class="fas fa-phone"></i> ${formData.phone}`;
+            userName.textContent = formData.fullName.split(' ')[0] + ' ' + formData.fullName.split(' ')[1];
+            
+            // Show success modal
+            document.getElementById('successTitle').textContent = 'Profile Updated!';
+            document.getElementById('successMessage').innerHTML = `
+                <em>Your profile information has been saved successfully.</em><br><br>
+            `;
+            document.getElementById('successModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            
+            addProfileUpdatedNotification();
+        });
+        
+        resetBtn.addEventListener('click', function() {
+            document.getElementById('fullName').value = originalValues.fullName;
+            document.getElementById('email').value = originalValues.email;
+            document.getElementById('phone').value = originalValues.phone;
+            document.getElementById('semester').value = originalValues.semester;
+            
+            document.getElementById('successTitle').textContent = 'Form Reset';
+            document.getElementById('successMessage').innerHTML = `
+                <em>Form has been reset to original values.</em>
+            `;
+            const successIcon = document.querySelector('#successModal .success-modal-icon');
+            successIcon.className = 'success-modal-icon modal-info';
+            successIcon.innerHTML = '<i class="fas fa-undo"></i>';
+            document.getElementById('successModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        });
+        
+        function addProfileUpdatedNotification() {
+            const notificationsContent = document.querySelector('.notifications-popup-content');
+            const notificationItem = document.createElement('div');
+            notificationItem.className = 'notification-item unread';
+            notificationItem.innerHTML = `
+                <div class="notification-icon success">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div class="notification-details">
+                    <h4>Profile Updated</h4>
+                    <p>Your profile information has been successfully updated.</p>
+                    <div class="notification-time">Just now</div>
+                </div>
+            `;
+            
+            notificationsContent.insertBefore(notificationItem, notificationsContent.firstChild);
+            
+            const badge = document.querySelector('.notification-badge');
+            const currentCount = parseInt(badge.textContent) || 0;
+            badge.textContent = currentCount + 1;
+            badge.style.display = 'flex';
+        }
+
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const passwordModal = document.getElementById('passwordModal');
+        const cancelPasswordBtn = document.getElementById('cancelPassword');
+        const updatePasswordBtn = document.getElementById('updatePassword');
+        
+        changePasswordBtn.addEventListener('click', () => {
+            passwordModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        });
+        
+        cancelPasswordBtn.addEventListener('click', () => {
+            passwordModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+        
+        updatePasswordBtn.addEventListener('click', () => {
+            const currentPass = document.getElementById('currentPassword').value;
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmPassword').value;
+            
+            if (!currentPass || !newPass || !confirmPass) {
+                showErrorModal('Please fill in all password fields');
+                return;
+            }
+            
+            if (newPass !== confirmPass) {
+                showErrorModal('New passwords do not match');
+                return;
+            }
+            
+            if (newPass.length < 6) {
+                showErrorModal('Password must be at least 6 characters long');
+                return;
+            }
+            
+            document.getElementById('successTitle').textContent = 'Password Updated!';
+            document.getElementById('successMessage').innerHTML = `
+                <em>Your password has been changed successfully.</em><br><br>
+                <small>You will be asked to use your new password the next time you log in.</small>
+            `;
+            document.getElementById('successModal').style.display = 'block';
+            
+            passwordModal.style.display = 'none';
+            
+            document.getElementById('currentPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+        });
+
+        function showErrorModal(message) {
+            document.getElementById('successTitle').textContent = 'Error!';
+            document.getElementById('successMessage').innerHTML = `
+                <div style="color: #e74c3c;">
+                    <i class="fas fa-exclamation-circle"></i> ${message}
+                </div>
+            `;
+            const successIcon = document.querySelector('#successModal .success-modal-icon');
+            successIcon.className = 'success-modal-icon modal-error';
+            successIcon.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+            document.getElementById('successModal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        const logoutModal = document.getElementById('logoutModal');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const cancelLogoutBtn = document.getElementById('cancelLogout');
+        const confirmLogoutBtn = document.getElementById('confirmLogout');
+
+        logoutBtn.addEventListener('click', () => {
+            logoutModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        });
+
+        cancelLogoutBtn.addEventListener('click', () => {
+            logoutModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        });
+
+        confirmLogoutBtn.addEventListener('click', () => {
+            document.getElementById('successTitle').textContent = 'Logging Out';
+            document.getElementById('successMessage').innerHTML = `
+                <div class="success-modal-icon modal-info" style="font-size: 3rem; margin-bottom: 20px;">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <p>You are being logged out...</p>
+                <p style="font-size: 0.9rem; color: #888;">Redirecting to login page.</p>
+            `;
+            document.getElementById('successModal').style.display = 'block';
+            logoutModal.style.display = 'none';
+            
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 1500);
+        });
+
+        function closeAllModals() {
+            const modals = ['successModal', 'passwordModal', 'logoutModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.style.display = 'none';
+                }
+            });
+            closeNotifications();
+            document.body.style.overflow = 'auto';
+            
+            const successIcon = document.querySelector('#successModal .success-modal-icon');
+            successIcon.className = 'success-modal-icon modal-success';
+            successIcon.innerHTML = '<i class="fas fa-check-circle"></i>';
+            document.getElementById('successTitle').textContent = 'Success!';
+        }
+
+        function closeModal() {
+            closeAllModals();
+        }
+
+        window.onclick = function(event) {
+            const modals = ['successModal', 'passwordModal', 'logoutModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
+        document.querySelectorAll('.btn').forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                if (!this.disabled) {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+                }
+            });
+            
+            button.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = 'none';
+            });
+        });
+      </script>
+    </body>
+</html>

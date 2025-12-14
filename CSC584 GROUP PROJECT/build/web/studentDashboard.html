@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Student Portal - Dashboard</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            :root {
+                --primary: #2c3e50;
+                --secondary: #3498db;
+                --accent: #e74c3c;
+                --light: #ecf0f1;
+                --dark: #2c3e50;
+                --success: #27ae60;
+                --warning: #f39c12;
+                --info: #17a2b8;
+                --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                --radius: 8px;
+            }
+
+            body {
+                background-color: #f5f7fa;
+                color: #333;
+                line-height: 1.6;
+                min-height: 100vh;
+                display: flex;
+            }
+
+            .sidebar {
+                width: 250px;
+                background-color: var(--primary);
+                color: white;
+                padding: 25px 0;
+                box-shadow: var(--shadow);
+                position: fixed;
+                height: 100vh;
+                overflow-y: auto;
+                z-index: 100;
+            }
+
+            .logo-area {
+                display: flex;
+                align-items: center;
+                padding: 0 20px 25px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                margin-bottom: 20px;
+            }
+
+            .logo-area h1 {
+                font-size: 1.5rem;
+                margin-left: 10px;
+                font-weight: 600;
+            }
+
+            .logo-icon {
+                background-color: var(--secondary);
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.2rem;
+            }
+
+            .nav-links {
+                list-style: none;
+                /*padding: 0 20px;*/
+            }
+
+            .nav-links li {
+                margin-bottom: 5px;
+            }
+
+            .nav-links a {
+                display: flex;
+                align-items: center;
+                padding: 15px 20px;
+                color: #ddd;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                /*border-radius: var(--radius);*/
+            }
+
+            .nav-links a:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: white;
+                border-left: 4px solid var(--secondary);
+            }
+
+            .nav-links a.active {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: white;
+                border-left: 4px solid var(--secondary);
+            }
+
+            .nav-links i {
+                margin-right: 12px;
+                font-size: 1.1rem;
+                width: 24px;
+                text-align: center;
+            }
+
+            /* Logout Button - Same as addstudent.html */
+            .logout-btn {
+                display: flex;
+                align-items: center;
+                padding: 15px 20px;
+                color: #ddd;
+                text-decoration: none;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                border: none;
+                background: none;
+                width: 100%;
+                text-align: left;
+                font-size: 1rem;
+            }
+
+            .logout-btn:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: white;
+                border-left: 4px solid var(--accent);
+            }
+
+            .logout-btn i {
+                margin-right: 12px;
+                font-size: 1.1rem;
+                width: 24px;
+                text-align: center;
+            }
+
+            .user-info {
+                position: absolute;
+                bottom: 80px; /* Increased to make room for logout button */
+                width: 100%;
+                padding: 0 20px;
+            }
+
+            .user-profile {
+                display: flex;
+                align-items: center;
+                padding: 15px;
+                background-color: rgba(255, 255, 255, 0.05);
+                border-radius: var(--radius);
+                margin-bottom: 15px;
+            }
+
+            .user-avatar {
+                width: 45px;
+                height: 45px;
+                border-radius: 50%;
+                background-color: var(--secondary);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-weight: bold;
+                font-size: 1.2rem;
+                margin-right: 12px;
+            }
+
+            .user-details h4 {
+                font-size: 0.95rem;
+                margin-bottom: 3px;
+            }
+
+            .user-details p {
+                font-size: 0.8rem;
+                color: #bbb;
+            }
+
+            .main-content {
+                flex: 1;
+                margin-left: 250px;
+                padding: 30px;
+            }
+
+            .header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 30px;
+                position: relative;
+            }
+
+            .header h2 {
+                color: var(--primary);
+                font-size: 1.4rem;
+            }
+
+            .notifications {
+                position: relative;
+                cursor: pointer;
+            }
+
+            .notification-badge {
+                position: absolute;
+                top: -8px;
+                right: -8px;
+                background-color: var(--accent);
+                color: white;
+                border-radius: 50%;
+                width: 20px;
+                height: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.7rem;
+                z-index: 101;
+            }
+
+            .notifications-popup {
+                position: absolute;
+                top: 50px;
+                right: 0;
+                width: 400px;
+                background-color: white;
+                border-radius: var(--radius);
+                box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+                z-index: 1000;
+                display: none;
+                animation: slideDown 0.3s ease;
+                border: 1px solid #eee;
+            }
+
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .notifications-popup-header {
+                padding: 20px;
+                border-bottom: 1px solid #eee;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background-color: #f8f9fa;
+                border-top-left-radius: var(--radius);
+                border-top-right-radius: var(--radius);
+            }
+
+            .notifications-popup-header h3 {
+                color: var(--primary);
+                font-size: 1.2rem;
+            }
+
+            .notifications-popup-content {
+                max-height: 400px;
+                overflow-y: auto;
+            }
+
+            .notification-item {
+                padding: 15px 20px;
+                border-bottom: 1px solid #f5f5f5;
+                display: flex;
+                align-items: flex-start;
+                transition: background-color 0.2s ease;
+            }
+
+            .notification-item:hover {
+                background-color: #f9f9f9;
+            }
+
+            .notification-item.unread {
+                background-color: #f0f7ff;
+            }
+
+            .notification-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 15px;
+                flex-shrink: 0;
+                font-size: 1rem;
+            }
+
+            .notification-icon.success {
+                background-color: #e7f7ef;
+                color: var(--success);
+            }
+
+            .notification-icon.warning {
+                background-color: #fef9e7;
+                color: #f39c12;
+            }
+
+            .notification-icon.info {
+                background-color: #e8f4fd;
+                color: var(--secondary);
+            }
+
+            .notification-icon.error {
+                background-color: #fdedec;
+                color: var(--accent);
+            }
+
+            .notification-details h4 {
+                font-size: 0.95rem;
+                margin-bottom: 5px;
+                color: var(--primary);
+            }
+
+            .notification-details p {
+                font-size: 0.85rem;
+                color: #666;
+                margin-bottom: 3px;
+            }
+
+            .notification-time {
+                font-size: 0.75rem;
+                color: #999;
+            }
+
+            .notifications-popup-footer {
+                padding: 15px 20px;
+                text-align: center;
+                border-top: 1px solid #eee;
+                background-color: #f8f9fa;
+                border-bottom-left-radius: var(--radius);
+                border-bottom-right-radius: var(--radius);
+            }
+
+            .mark-all-read {
+                background: none;
+                border: none;
+                color: var(--secondary);
+                cursor: pointer;
+                font-size: 0.9rem;
+                font-weight: 600;
+            }
+
+            .mark-all-read:hover {
+                text-decoration: underline;
+            }
+
+            /* Notification dropdown arrow */
+            .notifications-popup::before {
+                content: '';
+                position: absolute;
+                top: -10px;
+                right: 20px;
+                border-left: 10px solid transparent;
+                border-right: 10px solid transparent;
+                border-bottom: 10px solid white;
+            }
+
+            .dashboard-cards {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+                gap: 25px;
+                margin-bottom: 40px;
+            }
+
+            .card {
+                background-color: white;
+                border-radius: var(--radius);
+                padding: 25px;
+                box-shadow: var(--shadow);
+                transition: transform 0.3s ease;
+                cursor: pointer;
+            }
+
+            .card:hover {
+                transform: translateY(-5px);
+            }
+
+            .card-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 15px;
+            }
+
+            .card-icon {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 15px;
+                font-size: 1.3rem;
+                color: white;
+            }
+
+            .card-icon.mentor {
+                background-color: var(--secondary);
+            }
+
+            .card-icon.sessions {
+                background-color: var(--success);
+            }
+
+            .card-icon.enrollment {
+                background-color: var(--warning);
+            }
+
+            .card-icon.programs {
+                background-color: var(--info);
+            }
+
+            .card h3 {
+                font-size: 1.8rem;
+                margin-bottom: 5px;
+                color: var(--primary);
+            }
+
+            .card p {
+                color: #666;
+                font-size: 0.9rem;
+            }
+
+            .content-container {
+                display: grid;
+                grid-template-columns: 2fr 1fr;
+                gap: 30px;
+                margin-bottom: 30px;
+            }
+
+            .section {
+                background-color: white;
+                border-radius: var(--radius);
+                padding: 25px;
+                box-shadow: var(--shadow);
+                margin-bottom: 30px;
+            }
+
+            .section-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .section-header h3 {
+                color: var(--primary);
+                font-size: 1.4rem;
+                display: flex;
+                align-items: center;
+            }
+
+            .section-header i {
+                margin-right: 10px;
+                color: var(--secondary);
+            }
+
+            .view-all-link {
+                font-size: 0.9rem;
+                color: var(--secondary);
+                text-decoration: none;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .view-all-link:hover {
+                text-decoration: underline;
+            }
+
+            .details-list {
+                list-style: none;
+            }
+
+            .detail-item {
+                display: flex;
+                margin-bottom: 15px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid #f5f5f5;
+            }
+
+            .detail-item:last-child {
+                border-bottom: none;
+                margin-bottom: 0;
+                padding-bottom: 0;
+            }
+
+            .detail-label {
+                font-weight: 600;
+                min-width: 140px;
+                color: var(--primary);
+                display: flex;
+                align-items: center;
+            }
+
+            .detail-label i {
+                margin-right: 8px;
+                color: var(--secondary);
+                width: 20px;
+            }
+
+            .detail-value {
+                flex: 1;
+                color: #555;
+            }
+
+            .status {
+                padding: 5px 12px;
+                border-radius: 20px;
+                font-size: 0.85rem;
+                font-weight: 600;
+                display: inline-block;
+            }
+
+            .status.approved {
+                background-color: #e7f7ef;
+                color: var(--success);
+            }
+
+            .status.pending {
+                background-color: #fef7e6;
+                color: var(--warning);
+            }
+
+            .status.completed {
+                background-color: #e8f4fd;
+                color: var(--secondary);
+            }
+
+            .upcoming-session {
+                background-color: #f8fafd;
+                border-left: 4px solid var(--secondary);
+                padding: 20px;
+                border-radius: var(--radius);
+                margin-top: 15px;
+            }
+
+            .session-detail {
+                display: flex;
+                margin-bottom: 12px;
+                align-items: center;
+            }
+
+            .session-detail i {
+                color: var(--secondary);
+                margin-right: 10px;
+                width: 20px;
+            }
+
+            .session-topic {
+                font-weight: 600;
+                color: var(--primary);
+                margin-top: 15px;
+                padding-top: 15px;
+                border-top: 1px solid #eee;
+                display: flex;
+                align-items: center;
+            }
+
+            .session-topic i {
+                margin-right: 10px;
+                color: var(--warning);
+            }
+
+            /* Program Catalog Styles */
+            .program-catalog {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                gap: 20px;
+                margin-top: 15px;
+            }
+
+            .program-item {
+                background-color: white;
+                border-radius: var(--radius);
+                padding: 20px;
+                box-shadow: var(--shadow);
+                border-left: 4px solid var(--info);
+                transition: transform 0.3s ease;
+            }
+
+            .program-item:hover {
+                transform: translateY(-3px);
+            }
+
+            .program-item-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 10px;
+            }
+
+            .program-item-title {
+                font-weight: 600;
+                color: var(--primary);
+                font-size: 1.1rem;
+                margin-bottom: 5px;
+            }
+
+            .program-item-date {
+                font-size: 0.85rem;
+                color: #666;
+            }
+
+            .program-item-description {
+                font-size: 0.9rem;
+                color: #555;
+                margin-bottom: 15px;
+                line-height: 1.5;
+            }
+
+            .program-item-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-top: 10px;
+                border-top: 1px solid #eee;
+            }
+
+            .seats-badge {
+                padding: 4px 10px;
+                border-radius: 15px;
+                font-size: 0.8rem;
+                font-weight: 600;
+            }
+
+            .seats-available {
+                background-color: #e7f7ef;
+                color: var(--success);
+            }
+
+            .seats-limited {
+                background-color: #fef7e6;
+                color: var(--warning);
+            }
+
+            .view-program-btn {
+                padding: 8px 15px;
+                background-color: var(--secondary);
+                color: white;
+                border: none;
+                border-radius: var(--radius);
+                cursor: pointer;
+                font-size: 0.85rem;
+                font-weight: 600;
+                text-decoration: none;
+                transition: background-color 0.3s ease;
+                display: inline-block;
+            }
+
+            .view-program-btn:hover {
+                background-color: #2980b9;
+            }
+
+            .footer {
+                text-align: center;
+                padding: 20px;
+                color: #777;
+                font-size: 0.9rem;
+                border-top: 1px solid #eee;
+                margin-top: 30px;
+            }
+
+            .modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 1000;
+                animation: fadeIn 0.3s ease;
+                overflow-y: auto;
+                padding: 20px;
+            }
+
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+
+            @keyframes slideIn {
+                from {
+                    transform: translateY(-50px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+
+            .logout-modal {
+                background-color: white;
+                margin: 5% auto;
+                padding: 30px;
+                border-radius: var(--radius);
+                width: 90%;
+                max-width: 400px;
+                animation: slideIn 0.3s ease;
+                position: relative;
+            }
+
+            .logout-modal-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: 20px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid #eee;
+            }
+
+            .logout-modal-icon {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background-color: #ffeaea;
+                color: var(--accent);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+                margin-right: 15px;
+            }
+
+            .logout-modal-title {
+                color: var(--primary);
+                font-size: 1.3rem;
+            }
+
+            .logout-modal-body {
+                margin-bottom: 25px;
+            }
+
+            .logout-modal-body p {
+                color: #666;
+                line-height: 1.5;
+            }
+
+            .logout-modal-actions {
+                display: flex;
+                justify-content: flex-end;
+                gap: 15px;
+            }
+
+            .logout-modal-btn {
+                padding: 10px 20px;
+                border-radius: var(--radius);
+                border: none;
+                cursor: pointer;
+                font-weight: 600;
+                transition: all 0.3s ease;
+            }
+
+            .logout-modal-btn.cancel {
+                background-color: #ecf0f1;
+                color: #333;
+            }
+
+            .logout-modal-btn.cancel:hover {
+                background-color: #d5dbdb;
+            }
+
+            .logout-modal-btn.logout {
+                background-color: var(--accent);
+                color: white;
+            }
+
+            .logout-modal-btn.logout:hover {
+                background-color: #c0392b;
+            }
+
+            @media (max-width: 992px) {
+                .sidebar {
+                    width: 70px;
+                    padding-top: 25px;
+                }
+
+                .logo-area h1, .user-details, .nav-links a span, .logout-btn span {
+                    display: none;
+                }
+
+                .logo-area {
+                    justify-content: center;
+                    padding: 0 0 25px;
+                }
+
+                .logo-icon {
+                    margin: 0;
+                }
+
+                .nav-links {
+                    padding: 0;
+                }
+
+                .nav-links a {
+                    justify-content: center;
+                    padding: 15px 0;
+                }
+
+                .nav-links i {
+                    margin-right: 0;
+                    font-size: 1.3rem;
+                }
+
+                .logout-btn {
+                    justify-content: center;
+                    padding: 15px 0;
+                }
+
+                .logout-btn i {
+                    margin-right: 0;
+                    font-size: 1.3rem;
+                }
+
+                .user-profile {
+                    justify-content: center;
+                    padding: 15px 0;
+                }
+
+                .user-avatar {
+                    margin-right: 0;
+                }
+
+                .main-content {
+                    margin-left: 70px;
+                }
+
+                .content-container {
+                    grid-template-columns: 1fr;
+                }
+
+                .program-catalog {
+                    grid-template-columns: 1fr;
+                }
+                
+                .notifications-popup {
+                    width: 300px;
+                    right: -50px;
+                }
+                
+                .notifications-popup::before {
+                    right: 50px;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .dashboard-cards {
+                    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+                    gap: 20px;
+                }
+
+                .header h2 {
+                    font-size: 1.4rem;
+                }
+
+                .main-content {
+                    padding: 20px;
+                }
+
+                .section {
+                    padding: 20px;
+                }
+
+                .detail-item {
+                    flex-direction: column;
+                }
+
+                .detail-label {
+                    margin-bottom: 5px;
+                    min-width: auto;
+                }
+                
+                .logout-modal-actions {
+                    flex-direction: column;
+                }
+                
+                .logout-modal-btn {
+                    width: 100%;
+                }
+            }
+
+            @media (max-width: 576px) {
+                .dashboard-cards {
+                    grid-template-columns: 1fr;
+                }
+
+                .main-content {
+                    padding: 20px 15px;
+                }
+
+                .section {
+                    padding: 20px 15px;
+                }
+
+                .section-header h3 {
+                    font-size: 1.2rem;
+                }
+
+                .program-item-footer {
+                    flex-direction: column;
+                    gap: 10px;
+                    align-items: flex-start;
+                }
+
+                .view-program-btn {
+                    width: 100%;
+                    text-align: center;
+                }
+                
+                .notifications-popup {
+                    width: 280px;
+                    right: -70px;
+                }
+                
+                .notifications-popup::before {
+                    right: 70px;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <div class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h1>Student Portal</h1>
+            </div>
+
+            <ul class="nav-links">
+                <li>
+                    <a href="studentDashboard.html" class="active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="studentMentorship.html">
+                        <i class="fas fa-handshake"></i>
+                        <span>My Mentorship</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="studentHistory.html">
+                        <i class="fas fa-history"></i>
+                        <span>My History</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="studentProfile.html">
+                        <i class="fas fa-user-cog"></i>
+                        <span>My Profile</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="studentEnrollment.html">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>New Enrollment</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="user-info">
+                <div class="user-profile">
+                    <div class="user-avatar">NA</div>
+                    <div class="user-details">
+                        <h4>Nur Aisya</h4>
+                        <p>Computer Science</p>
+                    </div>
+                </div>
+                
+                <!-- Logout Button - Same as addstudent.html -->
+                <button class="logout-btn" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="header">
+                <h2><i class="fas fa-graduation-cap"></i>Dashboard</h2>
+                <div class="notifications" onclick="toggleNotifications()">
+                    <i class="fas fa-bell fa-lg"></i>
+                    <div class="notification-badge">3</div>
+                    
+                    <!-- Notifications Popup - EXACTLY like mentorprofile.html -->
+                    <div class="notifications-popup" id="notificationsPopup">
+                        <div class="notifications-popup-header">
+                            <h3>Notifications</h3>
+                            <button class="modal-close-btn" onclick="closeNotifications()">&times;</button>
+                        </div>
+                        <div class="notifications-popup-content">
+                            <div class="notification-item unread">
+                                <div class="notification-icon warning">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Upcoming Session Reminder</h4>
+                                    <p>You have a mentorship session today at 10:00 AM with Rihhadatul Aisy.</p>
+                                    <div class="notification-time">Today, 8:30 AM</div>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="notification-icon info">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>New Program Available</h4>
+                                    <p>"FYP Preparation Bootcamp" is now open for enrollment. Limited seats available.</p>
+                                    <div class="notification-time">Yesterday, 3:45 PM</div>
+                                </div>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="notification-icon warning">
+                                    <i class="fas fa-user-cog"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Profile Update Required</h4>
+                                    <p>Please update your contact information in your profile.</p>
+                                    <div class="notification-time">2 days ago</div>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon success">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Study Materials Uploaded</h4>
+                                    <p>New study materials for "Data Structures" have been uploaded.</p>
+                                    <div class="notification-time">1 week ago</div>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon info">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Academic Progress</h4>
+                                    <p>Your academic progress report for Semester 1 is now available.</p>
+                                    <div class="notification-time">1 week ago</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="notifications-popup-footer">
+                            <button class="mark-all-read" onclick="markAllAsRead()">Mark All as Read</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-cards">
+                <div class="card" onclick="window.location.href='studentMentorship.html'">
+                    <div class="card-header">
+                        <div class="card-icon mentor">
+                            <i class="fas fa-user-tie"></i>
+                        </div>
+                        <div>
+                            <h3>1</h3>
+                            <p>Active Mentor</p>
+                        </div>
+                    </div>
+                    <p>Rihhadatul Aisy binti Ariff</p>
+                </div>
+
+                <div class="card" onclick="window.location.href='studentMentorship.html'">
+                    <div class="card-header">
+                        <div class="card-icon sessions">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div>
+                            <h3>1</h3>
+                            <p>Upcoming Session</p>
+                        </div>
+                    </div>
+                    <p>Next: Today at 10:00 AM</p>
+                </div>
+
+                <div class="card" onclick="window.location.href='studentEnrollment.html'">
+                    <div class="card-header">
+                        <div class="card-icon enrollment">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <div>
+                            <h3>1</h3>
+                            <p>Active Enrollment</p>
+                        </div>
+                    </div>
+                    <p>Peer Mentoring 2025</p>
+                </div>
+
+                <div class="card" onclick="window.location.href='studentEnrollment.html'">
+                    <div class="card-header">
+                        <div class="card-icon programs">
+                            <i class="fas fa-project-diagram"></i>
+                        </div>
+                        <div>
+                            <h3>4</h3>
+                            <p>Programs Available</p>
+                        </div>
+                    </div>
+                    <p>Browse and enroll now</p>
+                </div>
+            </div>
+
+            <div class="content-container">
+                <div class="section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-id-card"></i> Student Details</h3>
+                    </div>
+                    
+                    <ul class="details-list">
+                        <li class="detail-item">
+                            <span class="detail-label">
+                                <i class="fas fa-id-badge"></i> Student ID:
+                            </span>
+                            <span class="detail-value">2025185601</span>
+                        </li>
+                        <li class="detail-item">
+                            <span class="detail-label">
+                                <i class="fas fa-user"></i> Name:
+                            </span>
+                            <span class="detail-value">Nur Aisya binti Afizi</span>
+                        </li>
+                        <li class="detail-item">
+                            <span class="detail-label">
+                                <i class="fas fa-phone"></i> Phone No:
+                            </span>
+                            <span class="detail-value">017-5659263</span>
+                        </li>
+                        <li class="detail-item">
+                            <span class="detail-label">
+                                <i class="fas fa-envelope"></i> Email:
+                            </span>
+                            <span class="detail-value">2025185601@student.uitm.edu.my</span>
+                        </li>
+                        <li class="detail-item">
+                            <span class="detail-label">
+                                <i class="fas fa-university"></i> Faculty:
+                            </span>
+                            <span class="detail-value">Faculty of Computer Sciences and Mathematics</span>
+                        </li>
+                        <li class="detail-item">
+                            <span class="detail-label">
+                                <i class="fas fa-graduation-cap"></i> Program:
+                            </span>
+                            <span class="detail-value">CS266</span>
+                        </li>
+                        <li class="detail-item">
+                            <span class="detail-label">
+                                <i class="fas fa-calendar-alt"></i> Semester:
+                            </span>
+                            <span class="detail-value">1</span>
+                        </li>
+                        <li class="detail-item">
+                            <span class="detail-label">
+                                <i class="fas fa-user-tie"></i> Mentor:
+                            </span>
+                            <span class="detail-value">Rihhadatul Aisy binti Ariff</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-clipboard-list"></i> Enrollment Status</h3>
+                    </div>
+                    
+                    <ul class="details-list">
+                        <li class="detail-item">
+                            <span class="detail-label">
+                                <i class="fas fa-book"></i> Program:
+                            </span>
+                            <span class="detail-value">Peer Mentoring 2025</span>
+                        </li>
+                        <li class="detail-item">
+                            <span class="detail-label">
+                                <i class="fas fa-tag"></i> Status:
+                            </span>
+                            <span class="detail-value">
+                                <span class="status approved">Approved</span>
+                            </span>
+                        </li>
+                        <li class="detail-item">
+                            <span class="detail-label">
+                                <i class="fas fa-calendar-alt"></i> Registered:
+                            </span>
+                            <span class="detail-value">10 January 2025</span>
+                        </li>
+                        <li class="detail-item">
+                            <span class="detail-label">
+                                <i class="fas fa-hourglass-half"></i> Duration:
+                            </span>
+                            <span class="detail-value">12 Weeks</span>
+                        </li>
+                        <li class="detail-item">
+                            <span class="detail-label">
+                                <i class="fas fa-calendar-alt"></i> Next Session:
+                            </span>
+                            <span class="detail-value">Today, 10:00 AM</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h3><i class="fas fa-calendar-alt"></i> Upcoming Session Details</h3>
+                </div>
+                
+                <div class="upcoming-session">
+                    <div class="session-detail">
+                        <i class="far fa-calendar"></i>
+                        <span><strong>Date:</strong> 15 February 2025</span>
+                    </div>
+                    <div class="session-detail">
+                        <i class="far fa-clock"></i>
+                        <span><strong>Time:</strong> 10:00 AM - 11:30 AM</span>
+                    </div>
+                    <div class="session-detail">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span><strong>Location:</strong> FSKTM Block B, Room 205</span>
+                    </div>
+                    <div class="session-detail">
+                        <i class="fas fa-user-tie"></i>
+                        <span><strong>Mentor:</strong> Rihhadatul Aisy binti Ariff</span>
+                    </div>
+                    <div class="session-topic">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                        <span><strong>Topic:</strong> Study Skill Improvement</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h3><i class="fas fa-project-diagram"></i> Available Programs</h3>
+                    <a href="studentEnrollment.html" class="view-all-link">
+                        View All <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                
+                <p style="margin-bottom: 15px; color: #666;">
+                    Browse mentorship programs and enroll in ones that match your interests.
+                </p>
+                
+                <div class="program-catalog">
+                    <div class="program-item">
+                        <div class="program-item-header">
+                            <div>
+                                <div class="program-item-title">Peer Mentoring 2025</div>
+                                <div class="program-item-date">1 Mar - 30 Jun 2025</div>
+                            </div>
+                            <div class="seats-badge seats-available">12 seats</div>
+                        </div>
+                        <div class="program-item-description">
+                            Mentorship for new students to adjust to university life. Includes study skills and campus guidance.
+                        </div>
+                        <div class="program-item-footer">
+                            <span class="detail-label">
+                                <i class="fas fa-map-marker-alt"></i> FSKTM Block B
+                            </span>
+                            <a href="studentEnrollment.html" class="view-program-btn">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="program-item">
+                        <div class="program-item-header">
+                            <div>
+                                <div class="program-item-title">Career Guidance Month</div>
+                                <div class="program-item-date">1 Sep - 30 Sep 2025</div>
+                            </div>
+                            <div class="seats-badge seats-available">40 seats</div>
+                        </div>
+                        <div class="program-item-description">
+                            Resume building, job interviews, and career planning with industry experts.
+                        </div>
+                        <div class="program-item-footer">
+                            <span class="detail-label">
+                                <i class="fas fa-map-marker-alt"></i> Online (Zoom)
+                            </span>
+                            <a href="studentEnrollment.html" class="view-program-btn">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="program-item">
+                        <div class="program-item-header">
+                            <div>
+                                <div class="program-item-title">FYP Preparation Bootcamp</div>
+                                <div class="program-item-date">10 May - 10 July 2025</div>
+                            </div>
+                            <div class="seats-badge seats-limited">18 seats</div>
+                        </div>
+                        <div class="program-item-description">
+                            Prepare for your Final Year Project with senior guidance and technical workshops.
+                        </div>
+                        <div class="program-item-footer">
+                            <span class="detail-label">
+                                <i class="fas fa-map-marker-alt"></i> Lab 3, Block F
+                            </span>
+                            <a href="studentEnrollment.html" class="view-program-btn">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p>Student Mentorship Program System © 2025</p>
+            </div>
+        </div>
+
+        <!-- Logout Confirmation Modal - EXACTLY like addstudent.html -->
+        <div id="logoutModal" class="modal">
+            <div class="logout-modal">
+                <div class="logout-modal-header">
+                    <div class="logout-modal-icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <h3 class="logout-modal-title">Confirm Logout</h3>
+                </div>
+                <div class="logout-modal-body">
+                    <p>Are you sure you want to logout from the Student Portal?</p>
+                    <p style="font-size: 0.9rem; color: #888; margin-top: 10px;">You will be redirected to the login page.</p>
+                </div>
+                <div class="logout-modal-actions">
+                    <button class="logout-modal-btn cancel" id="cancelLogout">Cancel</button>
+                    <button class="logout-modal-btn logout" id="confirmLogout">Logout</button>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            const today = new Date();
+            const sessionDate = new Date(2025, 1, 15);
+            const diffTime = sessionDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            
+            const sessionCard = document.querySelector('.card:nth-child(2) p');
+            if (diffDays === 0) {
+                sessionCard.textContent = 'Next: Today at 10:00 AM';
+            } else if (diffDays === 1) {
+                sessionCard.textContent = 'Next: Tomorrow at 10:00 AM';
+            } else if (diffDays > 0) {
+                sessionCard.textContent = `Next: In ${diffDays} days`;
+            } else {
+                sessionCard.textContent = 'No upcoming sessions';
+            }
+            
+            // Notification Popup Functionality - EXACTLY like mentorprofile.html
+            function toggleNotifications() {
+                const popup = document.getElementById('notificationsPopup');
+                if (popup.style.display === 'block') {
+                    closeNotifications();
+                } else {
+                    openNotifications();
+                }
+            }
+
+            // Open notifications popup
+            function openNotifications() {
+                const popup = document.getElementById('notificationsPopup');
+                popup.style.display = 'block';
+                
+                // Close logout modal if open
+                document.getElementById('logoutModal').style.display = 'none';
+            }
+
+            // Close notifications popup
+            function closeNotifications() {
+                document.getElementById('notificationsPopup').style.display = 'none';
+            }
+
+            function markAllAsRead() {
+                const notificationItems = document.querySelectorAll('.notification-item.unread');
+                notificationItems.forEach(item => {
+                    item.classList.remove('unread');
+                });
+                
+                document.querySelector('.notification-badge').textContent = '0';
+                document.querySelector('.notification-badge').style.display = 'none';
+                
+                // Close the popup
+                closeNotifications();
+            }
+
+            document.addEventListener('click', function(event) {
+                const notificationsPopup = document.getElementById('notificationsPopup');
+                const notificationsIcon = document.querySelector('.notifications');
+                
+                if (notificationsPopup.style.display === 'block' && 
+                    !notificationsPopup.contains(event.target) && 
+                    !notificationsIcon.contains(event.target)) {
+                    closeNotifications();
+                }
+            });
+
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape') {
+                    closeNotifications();
+                    
+                    const logoutModal = document.getElementById('logoutModal');
+                    if (logoutModal.style.display === 'block') {
+                        logoutModal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
+                }
+            });
+            
+            const logoutBtn = document.getElementById('logoutBtn');
+            const logoutModal = document.getElementById('logoutModal');
+            const cancelLogoutBtn = document.getElementById('cancelLogout');
+            const confirmLogoutBtn = document.getElementById('confirmLogout');
+
+            logoutBtn.addEventListener('click', () => {
+                logoutModal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                
+                closeNotifications();
+            });
+
+            cancelLogoutBtn.addEventListener('click', () => {
+                logoutModal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            });
+
+            logoutModal.addEventListener('click', (e) => {
+                if (e.target === logoutModal) {
+                    logoutModal.style.display = 'none';
+                    document.body.style.overflow = 'auto';
+                }
+            });
+
+            confirmLogoutBtn.addEventListener('click', () => {
+                const successModal = document.createElement('div');
+                successModal.className = 'modal';
+                successModal.id = 'tempSuccessModal';
+                successModal.innerHTML = `
+                    <div class="logout-modal">
+                        <div class="logout-modal-header">
+                            <div class="logout-modal-icon" style="background-color: #e7f7ef; color: var(--success);">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <h3 class="logout-modal-title">Logout Successful</h3>
+                        </div>
+                        <div class="logout-modal-body">
+                            <p>Logging out... Redirecting to login page.</p>
+                        </div>
+                        <div class="logout-modal-actions">
+                            <button class="logout-modal-btn logout" onclick="redirectToLogin()">OK</button>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(successModal);
+                successModal.style.display = 'block';
+            });
+
+            function redirectToLogin() {
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 500);
+            }
+            
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const todayFormatted = today.toLocaleDateString('en-US', dateOptions);
+            
+            const header = document.querySelector('.header h2');
+            header.innerHTML = `Dashboard <small style="font-size: 0.9rem; color: #666; font-weight: normal;">- ${todayFormatted}</small>`;
+        </script>
+    </body>
+</html>

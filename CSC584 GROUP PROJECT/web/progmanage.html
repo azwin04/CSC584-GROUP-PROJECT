@@ -1,0 +1,2260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Program Management - Mentorship System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --info: #17a2b8;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background-color: var(--primary);
+            color: white;
+            padding: 25px 0;
+            box-shadow: var(--shadow);
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .logo-area h1 {
+            font-size: 1.5rem;
+            margin-left: 10px;
+            font-weight: 600;
+        }
+
+        .logo-icon {
+            background-color: var(--secondary);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .nav-links {
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-bottom: 5px;
+        }
+
+        .nav-links a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .nav-links a.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .nav-links i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        /* Logout Button */
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: #ddd;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-size: 1rem;
+        }
+
+        .logout-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-left: 4px solid var(--accent);
+        }
+
+        .logout-btn i {
+            margin-right: 12px;
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .user-info {
+            position: absolute;
+            bottom: 80px;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius);
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 12px;
+        }
+
+        .user-details h4 {
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+        }
+
+        .user-details p {
+            font-size: 0.8rem;
+            color: #bbb;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .header h2 {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+
+        .notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+        }
+
+        /* Notification Popup Styles */
+        .notifications-popup {
+            position: absolute;
+            top: 50px;
+            right: 0;
+            width: 400px;
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            z-index: 1000;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notifications-popup-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .notifications-popup-header h3 {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .notifications-popup-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f5f5f5;
+            display: flex;
+            align-items: flex-start;
+            transition: background-color 0.2s ease;
+        }
+
+        .notification-item:hover {
+            background-color: #f9f9f9;
+        }
+
+        .notification-item.unread {
+            background-color: #f0f7ff;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .notification-icon.success {
+            background-color: #e7f7ef;
+            color: var(--success);
+        }
+
+        .notification-icon.warning {
+            background-color: #fef9e7;
+            color: #f39c12;
+        }
+
+        .notification-icon.info {
+            background-color: #e8f4fd;
+            color: var(--secondary);
+        }
+
+        .notification-icon.error {
+            background-color: #fdedec;
+            color: var(--accent);
+        }
+
+        .notification-details h4 {
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .notification-details p {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .notification-time {
+            font-size: 0.75rem;
+            color: #999;
+        }
+
+        .notifications-popup-footer {
+            padding: 15px 20px;
+            text-align: center;
+            border-top: 1px solid #eee;
+        }
+
+        .mark-all-read {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .mark-all-read:hover {
+            text-decoration: underline;
+        }
+        
+        .modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #777;
+        }
+
+        /* Notification dropdown arrow */
+        .notifications-popup::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            right: 20px;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-bottom: 10px solid white;
+        }
+
+        /* Sections */
+        .section {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        .section-header h3 {
+            color: var(--primary);
+            font-size: 1.4rem;
+        }
+
+        .btn {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 0.85rem;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+        }
+
+        .btn-danger {
+            background-color: var(--accent);
+        }
+
+        .btn-info {
+            background-color: var(--info);
+        }
+
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f8f9fa;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 1px solid #eee;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        .status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .status.active {
+            background-color: #e7f7ef;
+            color: var(--success);
+        }
+
+        .status.inactive {
+            background-color: #f5f5f5;
+            color: #777;
+        }
+
+        .status.draft {
+            background-color: #fef9e7;
+            color: #f39c12;
+        }
+
+        .program-badge {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-tech {
+            background-color: #e8f4fd;
+            color: var(--secondary);
+        }
+
+        .badge-leadership {
+            background-color: #f0f7ff;
+            color: #3498db;
+        }
+
+        .badge-career {
+            background-color: #f9f0ff;
+            color: #9b59b6;
+        }
+
+        .badge-business {
+            background-color: #e7f7ef;
+            color: var(--success);
+        }
+
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .logout-modal {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: var(--shadow);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .logout-modal {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ffeaea;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .modal-header h3 {
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        .modal-body {
+            margin-bottom: 25px;
+        }
+
+        .modal-body p {
+            color: #666;
+            line-height: 1.5;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border-radius: var(--radius);
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.cancel {
+            background-color: #ecf0f1;
+            color: #333;
+        }
+
+        .modal-btn.cancel:hover {
+            background-color: #d5dbdb;
+        }
+
+        .modal-btn.logout {
+            background-color: var(--accent);
+            color: white;
+        }
+
+        .modal-btn.logout:hover {
+            background-color: #c0392b;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--secondary);
+            outline: none;
+        }
+
+        /* Program Management Modal */
+        .program-modal {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: var(--shadow);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-overlay.active .program-modal {
+            transform: translateY(0);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+       
+        .search-filter-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 1px solid #ddd;
+            border-radius: var(--radius);
+            font-size: 0.95rem;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+       
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 20px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .stat-card p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .stat-card.active-programs {
+            border-top: 4px solid var(--success);
+        }
+
+        .stat-card.total-mentorships {
+            border-top: 4px solid var(--info);
+        }
+
+        .stat-card.avg-duration {
+            border-top: 4px solid var(--warning);
+        }
+
+        .stat-card.avg-rating {
+            border-top: 4px solid #9b59b6;
+        }
+
+       
+        .program-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .program-card {
+            background-color: white;
+            border-radius: var(--radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border-top: 4px solid var(--secondary);
+        }
+
+        .program-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .program-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .program-card-header h4 {
+            font-size: 1.2rem;
+            color: var(--primary);
+        }
+
+        .program-badge-small {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .program-card-body {
+            margin-bottom: 20px;
+        }
+
+        .program-card-body p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .program-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+
+        .program-stat {
+            text-align: center;
+        }
+
+        .program-stat h5 {
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .program-stat p {
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        .program-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* View Toggle */
+        .view-toggle {
+            display: flex;
+            background-color: #f5f5f5;
+            border-radius: var(--radius);
+            padding: 4px;
+            width: fit-content;
+            margin-bottom: 20px;
+        }
+
+        .view-toggle-btn {
+            padding: 8px 16px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .view-toggle-btn.active {
+            background-color: white;
+            box-shadow: var(--shadow);
+        }
+
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: #777;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+            margin-top: 30px;
+        }
+
+       
+        @media (max-width: 992px) {
+            .sidebar {
+                width: 70px;
+                padding-top: 25px;
+            }
+
+            .logo-area h1, .user-details, .nav-links a span, .logout-btn span {
+                display: none;
+            }
+
+            .logo-area {
+                justify-content: center;
+                padding: 0 0 25px;
+            }
+
+            .logo-icon {
+                margin: 0;
+            }
+
+            .nav-links a {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .nav-links i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+
+            .logout-btn {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .logout-btn i {
+                margin-right: 0;
+                font-size: 1.3rem;
+            }
+
+            .user-profile {
+                justify-content: center;
+                padding: 15px 0;
+            }
+
+            .user-avatar {
+                margin-right: 0;
+            }
+
+            .main-content {
+                margin-left: 70px;
+            }
+            
+            .notifications-popup {
+                width: 300px;
+                right: -50px;
+            }
+            
+            .notifications-popup::before {
+                right: 50px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h2 {
+                font-size: 1.4rem;
+            }
+
+            .modal-actions {
+                flex-direction: column;
+            }
+
+            .modal-btn {
+                width: 100%;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .search-filter-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                min-width: 100%;
+            }
+
+            .stats-cards {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .program-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 20px 15px;
+            }
+
+            .section {
+                padding: 20px 15px;
+            }
+            
+            .notifications-popup {
+                width: 280px;
+                right: -70px;
+            }
+            
+            .notifications-popup::before {
+                right: 70px;
+            }
+
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .program-card-footer {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+        <div class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <h1>Student Portal</h1>
+            </div>
+            
+            <ul class="nav-links">
+                <li>
+                    <a href="admindashboard.html">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="usermanage.html">
+                        <i class="fas fa-users"></i>
+                        <span>User Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="progmanage.html" class="active">
+                        <i class="fas fa-project-diagram"></i>
+                        <span>Program Management</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="reports.html">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>Reports</span>
+                    </a>
+                </li>
+            </ul>
+            
+            <div class="user-info">
+                <div class="user-profile">
+                    <div class="user-avatar">AS</div>
+                    <div class="user-details">
+                        <h4>Anissa Syuhada</h4>
+                        <p>Administrator</p>
+                    </div>
+                </div>
+                
+                <button class="logout-btn" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <h2>Program Management</h2>
+                <div class="notifications" id="notifications">
+                    <i class="fas fa-bell fa-lg"></i>
+                    <span class="notification-badge">1</span>
+                    <div class="notifications-popup" id="notifications-popup">
+                        <div class="notifications-popup-header">
+                            <h3>Notifications</h3>
+                            <button class="modal-close-btn" onclick="closeNotifications()">&times;</button>
+                        </div>
+                        <div class="notifications-popup-content">
+                            <div class="notification-item unread">
+                                <div class="notification-icon info">
+                                    <i class="fas fa-project-diagram"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>New Program Enrollment</h4>
+                                    <p>5 students have enrolled in the Tech Mentorship program this week.</p>
+                                    <span class="notification-time">3 hours ago</span>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Program Ending Soon</h4>
+                                    <p>The Leadership Program batch is ending in 2 weeks.</p>
+                                    <span class="notification-time">Yesterday</span>
+                                </div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-icon success">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="notification-details">
+                                    <h4>Program Completed</h4>
+                                    <p>Career Development program batch has been successfully completed.</p>
+                                    <span class="notification-time">3 days ago</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="notifications-popup-footer">
+                            <button class="mark-all-read" onclick="markAllAsRead()">Mark all as read</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Program Statistics -->
+            <div class="stats-cards">
+                <div class="stat-card active-programs" onclick="filterPrograms('active')">
+                    <h3 id="active-programs-count">0</h3>
+                    <p>Active Programs</p>
+                </div>
+                <div class="stat-card total-mentorships" onclick="filterPrograms('all')">
+                    <h3 id="total-mentorships-count">0</h3>
+                    <p>Total Mentorships</p>
+                </div>
+                <div class="stat-card avg-duration">
+                    <h3 id="avg-duration-count">0</h3>
+                    <p>Avg. Duration (months)</p>
+                </div>
+                <div class="stat-card avg-rating">
+                    <h3 id="avg-rating-count">0</h3>
+                    <p>Avg. Rating</p>
+                </div>
+            </div>
+            
+            <!-- Program Management Section -->
+            <div class="section">
+                <div class="section-header">
+                    <h3>Manage Programs</h3>
+                    <button class="btn" onclick="showAddProgramModal()">
+                        <i class="fas fa-plus-circle"></i> Create New Program
+                    </button>
+                </div>
+                
+                <!-- View Toggle -->
+                <div class="view-toggle">
+                    <button class="view-toggle-btn active" id="tableViewBtn" onclick="toggleView('table')">
+                        <i class="fas fa-table"></i> Table View
+                    </button>
+                    <button class="view-toggle-btn" id="cardViewBtn" onclick="toggleView('card')">
+                        <i class="fas fa-th-large"></i> Card View
+                    </button>
+                </div>
+                
+                <!-- Search and Filter -->
+                <div class="search-filter-bar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-programs" placeholder="Search programs by name, category, or description..." onkeyup="searchPrograms()">
+                    </div>
+                    
+                    <div class="filter-buttons">
+                        <button class="btn btn-small active" onclick="filterPrograms('all')">All</button>
+                        <button class="btn btn-small" onclick="filterPrograms('active')">Active</button>
+                        <button class="btn btn-small" onclick="filterPrograms('inactive')">Inactive</button>
+                        <button class="btn btn-small" onclick="filterPrograms('tech')">Tech</button>
+                        <button class="btn btn-small" onclick="filterPrograms('leadership')">Leadership</button>
+                        <button class="btn btn-small" onclick="filterPrograms('career')">Career</button>
+                    </div>
+                </div>
+                
+                <!-- Table View -->
+                <div id="table-view">
+                    <table id="programs-table">
+                        <thead>
+                            <tr>
+                                <th>Program Name</th>
+                                <th>Category</th>
+                                <th>Duration</th>
+                                <th>Active Mentorships</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="programs-table-body">
+                            <!-- Programs will be dynamically added here -->
+                        </tbody>
+                    </table>
+                    
+                    <!-- Pagination -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                        <div style="color: #666; font-size: 0.9rem;">
+                            Showing <span id="showing-count">0</span> of <span id="total-count">0</span> programs
+                        </div>
+                        <div>
+                            <button class="btn btn-small" id="prev-page" onclick="changePage(-1)" disabled>
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </button>
+                            <span style="margin: 0 15px; font-weight: 600;" id="current-page">1</span>
+                            <button class="btn btn-small" id="next-page" onclick="changePage(1)">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Card View -->
+                <div id="card-view" style="display: none;">
+                    <div class="program-cards" id="program-cards-container">
+                        <!-- Program cards will be dynamically added here -->
+                    </div>
+                    
+                    <!-- Pagination for Cards -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+                        <div style="color: #666; font-size: 0.9rem;">
+                            Showing <span id="showing-cards-count">0</span> of <span id="total-cards-count">0</span> programs
+                        </div>
+                        <div>
+                            <button class="btn btn-small" id="prev-page-cards" onclick="changePageCards(-1)" disabled>
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </button>
+                            <span style="margin: 0 15px; font-weight: 600;" id="current-page-cards">1</span>
+                            <button class="btn btn-small" id="next-page-cards" onclick="changePageCards(1)">
+                                Next <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Footer -->
+            <div class="footer">
+                <p>Student Mentorship Program System © 2025</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Logout Modal -->
+    <div class="modal-overlay" id="logout-modal">
+        <div class="logout-modal">
+            <div class="modal-header">
+                <div class="modal-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <h3>Confirm Logout</h3>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to logout from the Mentorship Management System?</p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="cancel-logout">Cancel</button>
+                <button class="modal-btn logout" id="confirm-logout">Logout</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add/Edit Program Modal -->
+    <div class="modal-overlay" id="program-modal">
+        <div class="program-modal">
+            <div class="modal-header">
+                <div class="modal-icon" id="modal-icon" style="background-color: #fef9e7; color: var(--warning);">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h3 id="modal-title">Create New Program</h3>
+                <button class="modal-close-btn" onclick="closeProgramModal()" style="margin-left: auto;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="program-form">
+                    <div class="form-group">
+                        <label for="program-name">Program Name *</label>
+                        <input type="text" id="program-name" class="form-control" placeholder="e.g., Tech Mentorship Program" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="category">Category *</label>
+                            <select id="category" class="form-control" required>
+                                <option value="">Select Category</option>
+                                <option value="tech">Technology</option>
+                                <option value="leadership">Leadership</option>
+                                <option value="career">Career Development</option>
+                                <option value="business">Business</option>
+                                <option value="health">Health & Wellness</option>
+                                <option value="creative">Creative Arts</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="duration">Duration (months) *</label>
+                            <input type="number" id="duration" class="form-control" min="1" max="24" value="3" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="max-participants">Max Participants</label>
+                            <input type="number" id="max-participants" class="form-control" min="1" max="100" value="20">
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Status *</label>
+                            <select id="status" class="form-control" required>
+                                <option value="active">Active</option>
+                                <option value="inactive">Inactive</option>
+                                <option value="draft">Draft</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="description">Description *</label>
+                        <textarea id="description" class="form-control" rows="4" placeholder="Describe the program objectives, target audience, and key benefits..." required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="objectives">Learning Objectives (one per line)</label>
+                        <textarea id="objectives" class="form-control" rows="3" placeholder="Enter learning objectives, one per line..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="prerequisites">Prerequisites (one per line)</label>
+                        <textarea id="prerequisites" class="form-control" rows="2" placeholder="Enter any prerequisites, one per line..."></textarea>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="start-date">Start Date</label>
+                            <input type="date" id="start-date" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="end-date">End Date</label>
+                            <input type="date" id="end-date" class="form-control">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Additional Notes</label>
+                        <textarea id="notes" class="form-control" rows="3" placeholder="Any additional information about the program..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeProgramModal()">Cancel</button>
+                <button class="modal-btn logout" onclick="saveProgram()" id="save-program-btn" style="background-color: var(--success);">
+                    Create Program
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="delete-modal">
+        <div class="logout-modal" style="max-width: 450px;">
+            <div class="modal-header">
+                <div class="modal-icon" style="background-color: #fdedec; color: var(--accent);">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <h3>Confirm Delete</h3>
+                <button class="modal-close-btn" onclick="closeDeleteModal()" style="margin-left: auto;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="delete-message">Are you sure you want to delete this program? This action cannot be undone.</p>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button class="modal-btn logout" onclick="confirmDelete()">Delete Program</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- View Details Modal -->
+    <div class="modal-overlay" id="details-modal">
+        <div class="logout-modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <div class="modal-icon" style="background-color: #e8f4fd; color: var(--info);">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h3 id="details-title">Program Details</h3>
+                <button class="modal-close-btn" onclick="closeDetailsModal()" style="margin-left: auto;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="program-details-content">
+                    <!-- Program details will be dynamically added here -->
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="modal-btn cancel" onclick="closeDetailsModal()">Close</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Sample program data
+        let programsData = [
+            {
+                id: 1,
+                name: "Tech Mentorship Program",
+                category: "tech",
+                description: "Comprehensive software development mentorship covering frontend, backend, and DevOps technologies. Perfect for aspiring developers looking to advance their careers.",
+                duration: 6,
+                maxParticipants: 25,
+                currentParticipants: 18,
+                status: "active",
+                startDate: "2023-09-01",
+                endDate: "2024-02-29",
+                objectives: ["Master modern JavaScript frameworks", "Learn backend development with Node.js", "Understand DevOps principles", "Build a portfolio of real projects"],
+                prerequisites: ["Basic programming knowledge", "Familiarity with HTML/CSS", "Willingness to commit 10+ hours/week"],
+                rating: 4.8,
+                totalMentorships: 42,
+                notes: "Most popular program. High demand for advanced topics."
+            },
+            {
+                id: 2,
+                name: "Leadership Development Program",
+                category: "leadership",
+                description: "Develop essential leadership skills for managers and team leads. Focus on communication, decision-making, and team management.",
+                duration: 4,
+                maxParticipants: 20,
+                currentParticipants: 15,
+                status: "active",
+                startDate: "2023-10-15",
+                endDate: "2024-02-15",
+                objectives: ["Improve team communication skills", "Learn effective delegation techniques", "Develop strategic thinking", "Master conflict resolution"],
+                prerequisites: ["Management experience or aspiration", "Basic understanding of team dynamics"],
+                rating: 4.6,
+                totalMentorships: 35,
+                notes: "Includes weekly group sessions and one-on-one coaching."
+            },
+            {
+                id: 3,
+                name: "Career Transition Program",
+                category: "career",
+                description: "Guidance for professionals looking to change careers. Focus on skill assessment, resume building, interview preparation, and networking.",
+                duration: 3,
+                maxParticipants: 30,
+                currentParticipants: 22,
+                status: "active",
+                startDate: "2023-11-01",
+                endDate: "2024-01-31",
+                objectives: ["Identify transferable skills", "Create compelling career documents", "Master interview techniques", "Build professional network"],
+                prerequisites: ["Minimum 2 years work experience", "Clear career transition goal"],
+                rating: 4.9,
+                totalMentorships: 28,
+                notes: "High success rate - 85% of participants secure new roles within 3 months."
+            },
+            {
+                id: 4,
+                name: "Business Strategy Mentorship",
+                category: "business",
+                description: "For entrepreneurs and business leaders looking to develop and implement effective business strategies. Covers market analysis, competitive positioning, and growth planning.",
+                duration: 5,
+                maxParticipants: 15,
+                currentParticipants: 8,
+                status: "active",
+                startDate: "2023-12-01",
+                endDate: "2024-04-30",
+                objectives: ["Develop comprehensive business plans", "Learn market analysis techniques", "Understand financial modeling", "Create growth strategies"],
+                prerequisites: ["Business ownership or leadership role", "Basic understanding of business concepts"],
+                rating: 4.5,
+                totalMentorships: 12,
+                notes: "Includes access to business plan templates and financial models."
+            },
+            {
+                id: 5,
+                name: "Health & Wellness Coaching",
+                category: "health",
+                description: "Holistic wellness program focusing on physical, mental, and emotional well-being. Includes nutrition guidance, exercise planning, and stress management.",
+                duration: 2,
+                maxParticipants: 40,
+                currentParticipants: 3,
+                status: "inactive",
+                startDate: "2023-08-01",
+                endDate: "2023-09-30",
+                objectives: ["Develop sustainable exercise habits", "Learn nutritional principles", "Master stress management techniques", "Create personalized wellness plan"],
+                prerequisites: ["Commitment to personal well-being", "No specific experience required"],
+                rating: 4.7,
+                totalMentorships: 8,
+                notes: "Program on hold due to low enrollment. Consider revising marketing strategy."
+            },
+            {
+                id: 6,
+                name: "Creative Writing Mentorship",
+                category: "creative",
+                description: "For aspiring writers looking to develop their craft. Covers fiction, non-fiction, and poetry writing techniques with personalized feedback.",
+                duration: 3,
+                maxParticipants: 12,
+                currentParticipants: 12,
+                status: "active",
+                startDate: "2024-01-15",
+                endDate: "2024-04-15",
+                objectives: ["Develop unique writing voice", "Learn storytelling techniques", "Master editing and revision", "Prepare work for publication"],
+                prerequisites: ["Passion for writing", "Willingness to share work for feedback"],
+                rating: 4.9,
+                totalMentorships: 15,
+                notes: "Waitlist available for next cohort. Very popular program."
+            },
+            {
+                id: 7,
+                name: "Data Science Bootcamp",
+                category: "tech",
+                description: "Intensive data science program covering Python, statistics, machine learning, and data visualization. Project-based learning approach.",
+                duration: 4,
+                maxParticipants: 20,
+                currentParticipants: 0,
+                status: "draft",
+                startDate: "",
+                endDate: "",
+                objectives: ["Master Python for data analysis", "Learn statistical modeling techniques", "Understand machine learning algorithms", "Create data visualizations"],
+                prerequisites: ["Programming experience preferred", "Strong math background"],
+                rating: 0,
+                totalMentorships: 0,
+                notes: "Program in development. Launch planned for Q2 2024."
+            },
+            {
+                id: 8,
+                name: "Public Speaking Mastery",
+                category: "leadership",
+                description: "Overcome stage fright and become a confident public speaker. Covers speech writing, delivery techniques, and audience engagement.",
+                duration: 2,
+                maxParticipants: 25,
+                currentParticipants: 20,
+                status: "active",
+                startDate: "2023-12-10",
+                endDate: "2024-02-10",
+                objectives: ["Overcome public speaking anxiety", "Learn speech structuring techniques", "Master vocal delivery and body language", "Engage diverse audiences"],
+                prerequisites: ["Willingness to speak in front of groups", "No prior experience required"],
+                rating: 4.8,
+                totalMentorships: 25,
+                notes: "Includes video recording and feedback sessions."
+            }
+        ];
+
+        // State variables
+        let currentFilter = 'all';
+        let currentSearch = '';
+        let currentPage = 1;
+        let currentPageCards = 1;
+        const programsPerPage = 5;
+        const cardsPerPage = 4;
+        let editingProgramId = null;
+        let deletingProgramId = null;
+        let currentView = 'table';
+
+        // Initialize the program management page
+        function initProgramManagement() {
+            renderProgramsTable();
+            renderProgramCards();
+            updateProgramStats();
+            updatePagination();
+        }
+
+        // Render programs table
+        function renderProgramsTable() {
+            const tableBody = document.getElementById('programs-table-body');
+            tableBody.innerHTML = '';
+            
+            // Filter and search programs
+            let filteredPrograms = filterAndSearchPrograms();
+            
+            // Calculate pagination
+            const startIndex = (currentPage - 1) * programsPerPage;
+            const endIndex = startIndex + programsPerPage;
+            const paginatedPrograms = filteredPrograms.slice(startIndex, endIndex);
+            
+            // Update showing count
+            document.getElementById('showing-count').textContent = 
+                `${startIndex + 1}-${Math.min(endIndex, filteredPrograms.length)}`;
+            document.getElementById('total-count').textContent = filteredPrograms.length;
+            
+            // Render each program
+            paginatedPrograms.forEach(program => {
+                const row = document.createElement('tr');
+                
+                // Get category badge
+                let categoryBadgeClass = '';
+                let categoryDisplay = '';
+                if (program.category === 'tech') {
+                    categoryBadgeClass = 'badge-tech';
+                    categoryDisplay = 'Technology';
+                } else if (program.category === 'leadership') {
+                    categoryBadgeClass = 'badge-leadership';
+                    categoryDisplay = 'Leadership';
+                } else if (program.category === 'career') {
+                    categoryBadgeClass = 'badge-career';
+                    categoryDisplay = 'Career';
+                } else if (program.category === 'business') {
+                    categoryBadgeClass = 'badge-business';
+                    categoryDisplay = 'Business';
+                } else {
+                    categoryBadgeClass = 'program-badge';
+                    categoryDisplay = program.category.charAt(0).toUpperCase() + program.category.slice(1);
+                }
+                
+                // Get status class
+                let statusClass = '';
+                if (program.status === 'active') {
+                    statusClass = 'status active';
+                } else if (program.status === 'inactive') {
+                    statusClass = 'status inactive';
+                } else if (program.status === 'draft') {
+                    statusClass = 'status draft';
+                }
+                
+                // Calculate enrollment percentage
+                const enrollmentPercentage = program.maxParticipants > 0 
+                    ? Math.round((program.currentParticipants / program.maxParticipants) * 100) 
+                    : 0;
+                
+                row.innerHTML = `
+                    <td>
+                        <div style="font-weight: 600;">${program.name}</div>
+                        <div style="font-size: 0.85rem; color: #666; margin-top: 5px;">${program.description.substring(0, 80)}...</div>
+                    </td>
+                    <td><span class="program-badge ${categoryBadgeClass}">${categoryDisplay}</span></td>
+                    <td>${program.duration} months</td>
+                    <td>
+                        <div>${program.currentParticipants}/${program.maxParticipants}</div>
+                        <div style="width: 100%; background-color: #f0f0f0; border-radius: 4px; height: 6px; margin-top: 5px;">
+                            <div style="width: ${enrollmentPercentage}%; background-color: ${enrollmentPercentage > 80 ? 'var(--success)' : enrollmentPercentage > 50 ? 'var(--warning)' : 'var(--secondary)'}; height: 100%; border-radius: 4px;"></div>
+                        </div>
+                        <div style="font-size: 0.8rem; color: #777; margin-top: 3px;">${enrollmentPercentage}% full</div>
+                    </td>
+                    <td><span class="${statusClass}">${program.status.charAt(0).toUpperCase() + program.status.slice(1)}</span></td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-small btn-success" onclick="viewProgramDetails(${program.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-small btn-info" onclick="editProgram(${program.id})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-small btn-danger" onclick="deleteProgram(${program.id})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+            
+            // Update pagination buttons
+            updatePaginationButtons(filteredPrograms.length);
+        }
+
+        // Render program cards
+        function renderProgramCards() {
+            const cardsContainer = document.getElementById('program-cards-container');
+            cardsContainer.innerHTML = '';
+            
+            // Filter and search programs
+            let filteredPrograms = filterAndSearchPrograms();
+            
+            // Calculate pagination for cards
+            const startIndex = (currentPageCards - 1) * cardsPerPage;
+            const endIndex = startIndex + cardsPerPage;
+            const paginatedPrograms = filteredPrograms.slice(startIndex, endIndex);
+            
+            // Update showing count for cards
+            document.getElementById('showing-cards-count').textContent = 
+                `${startIndex + 1}-${Math.min(endIndex, filteredPrograms.length)}`;
+            document.getElementById('total-cards-count').textContent = filteredPrograms.length;
+            
+            // Render each program as a card
+            paginatedPrograms.forEach(program => {
+                const card = document.createElement('div');
+                card.className = 'program-card';
+                
+                // Get category badge
+                let categoryBadgeClass = '';
+                let categoryDisplay = '';
+                if (program.category === 'tech') {
+                    categoryBadgeClass = 'badge-tech';
+                    categoryDisplay = 'Technology';
+                } else if (program.category === 'leadership') {
+                    categoryBadgeClass = 'badge-leadership';
+                    categoryDisplay = 'Leadership';
+                } else if (program.category === 'career') {
+                    categoryBadgeClass = 'badge-career';
+                    categoryDisplay = 'Career';
+                } else if (program.category === 'business') {
+                    categoryBadgeClass = 'badge-business';
+                    categoryDisplay = 'Business';
+                } else {
+                    categoryBadgeClass = 'program-badge-small';
+                    categoryDisplay = program.category.charAt(0).toUpperCase() + program.category.slice(1);
+                }
+                
+                // Get status class
+                let statusClass = '';
+                if (program.status === 'active') {
+                    statusClass = 'status active';
+                } else if (program.status === 'inactive') {
+                    statusClass = 'status inactive';
+                } else if (program.status === 'draft') {
+                    statusClass = 'status draft';
+                }
+                
+                // Calculate enrollment percentage
+                const enrollmentPercentage = program.maxParticipants > 0 
+                    ? Math.round((program.currentParticipants / program.maxParticipants) * 100) 
+                    : 0;
+                
+                // Format dates
+                let dateInfo = '';
+                if (program.startDate && program.endDate) {
+                    const startDate = new Date(program.startDate);
+                    const endDate = new Date(program.endDate);
+                    const formattedStart = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    const formattedEnd = endDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    dateInfo = `${formattedStart} - ${formattedEnd}`;
+                } else {
+                    dateInfo = 'Dates to be announced';
+                }
+                
+                card.innerHTML = `
+                    <div class="program-card-header">
+                        <h4>${program.name}</h4>
+                        <span class="program-badge-small ${categoryBadgeClass}">${categoryDisplay}</span>
+                    </div>
+                    <div class="program-card-body">
+                        <p>${program.description.substring(0, 120)}...</p>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                            <span><strong>Duration:</strong> ${program.duration} months</span>
+                            <span class="${statusClass}">${program.status.charAt(0).toUpperCase() + program.status.slice(1)}</span>
+                        </div>
+                        <div>
+                            <strong>Enrollment:</strong> ${program.currentParticipants}/${program.maxParticipants}
+                            <div style="width: 100%; background-color: #f0f0f0; border-radius: 4px; height: 8px; margin-top: 5px;">
+                                <div style="width: ${enrollmentPercentage}%; background-color: ${enrollmentPercentage > 80 ? 'var(--success)' : enrollmentPercentage > 50 ? 'var(--warning)' : 'var(--secondary)'}; height: 100%; border-radius: 4px;"></div>
+                            </div>
+                            <div style="font-size: 0.8rem; color: #777; margin-top: 3px;">${enrollmentPercentage}% full</div>
+                        </div>
+                    </div>
+                    <div class="program-stats">
+                        <div class="program-stat">
+                            <h5>${program.rating}</h5>
+                            <p>Rating</p>
+                        </div>
+                        <div class="program-stat">
+                            <h5>${program.totalMentorships}</h5>
+                            <p>Mentorships</p>
+                        </div>
+                        <div class="program-stat">
+                            <h5>${dateInfo}</h5>
+                            <p>Schedule</p>
+                        </div>
+                    </div>
+                    <div class="program-card-footer">
+                        <div>
+                            <button class="btn btn-small btn-success" onclick="viewProgramDetails(${program.id})">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn btn-small btn-info" onclick="editProgram(${program.id})" style="margin-left: 8px;">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                        </div>
+                        <button class="btn btn-small btn-danger" onclick="deleteProgram(${program.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                cardsContainer.appendChild(card);
+            });
+            
+            // Update pagination buttons for cards
+            updatePaginationButtonsCards(filteredPrograms.length);
+        }
+
+        // Filter and search programs
+        function filterAndSearchPrograms() {
+            let filteredPrograms = programsData;
+            
+            // Apply filter
+            if (currentFilter === 'active' || currentFilter === 'inactive' || currentFilter === 'draft') {
+                filteredPrograms = filteredPrograms.filter(program => program.status === currentFilter);
+            } else if (currentFilter === 'tech' || currentFilter === 'leadership' || currentFilter === 'career' || currentFilter === 'business' || currentFilter === 'health' || currentFilter === 'creative') {
+                filteredPrograms = filteredPrograms.filter(program => program.category === currentFilter);
+            }
+            
+            // Apply search
+            if (currentSearch) {
+                const searchLower = currentSearch.toLowerCase();
+                filteredPrograms = filteredPrograms.filter(program => 
+                    program.name.toLowerCase().includes(searchLower) ||
+                    program.description.toLowerCase().includes(searchLower) ||
+                    program.category.toLowerCase().includes(searchLower) ||
+                    program.status.toLowerCase().includes(searchLower)
+                );
+            }
+            
+            return filteredPrograms;
+        }
+
+        // Filter programs
+        function filterPrograms(filterType) {
+            currentFilter = filterType;
+            currentPage = 1;
+            currentPageCards = 1;
+            
+            // Update button states
+            const buttons = document.querySelectorAll('.filter-buttons .btn-small');
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Find and activate the clicked button
+            const activeBtn = Array.from(buttons).find(btn => 
+                btn.textContent.toLowerCase().includes(filterType) || 
+                (filterType === 'all' && btn.textContent === 'All')
+            );
+            
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+            
+            renderProgramsTable();
+            renderProgramCards();
+            updateProgramStats();
+        }
+
+        // Search programs
+        function searchPrograms() {
+            currentSearch = document.getElementById('search-programs').value.toLowerCase();
+            currentPage = 1;
+            currentPageCards = 1;
+            renderProgramsTable();
+            renderProgramCards();
+        }
+
+        // Toggle between table and card view
+        function toggleView(viewType) {
+            currentView = viewType;
+            
+            // Update button states
+            document.getElementById('tableViewBtn').classList.toggle('active', viewType === 'table');
+            document.getElementById('cardViewBtn').classList.toggle('active', viewType === 'card');
+            
+            // Show/hide views
+            document.getElementById('table-view').style.display = viewType === 'table' ? 'block' : 'none';
+            document.getElementById('card-view').style.display = viewType === 'card' ? 'block' : 'none';
+        }
+
+        // Update program statistics
+        function updateProgramStats() {
+            const activePrograms = programsData.filter(program => program.status === 'active').length;
+            const totalMentorships = programsData.reduce((sum, program) => sum + program.totalMentorships, 0);
+            const avgDuration = programsData.length > 0 
+                ? (programsData.reduce((sum, program) => sum + program.duration, 0) / programsData.length).toFixed(1)
+                : 0;
+            const avgRating = programsData.filter(program => program.rating > 0).length > 0
+                ? (programsData.filter(program => program.rating > 0).reduce((sum, program) => sum + program.rating, 0) / programsData.filter(program => program.rating > 0).length).toFixed(1)
+                : 0;
+            
+            document.getElementById('active-programs-count').textContent = activePrograms;
+            document.getElementById('total-mentorships-count').textContent = totalMentorships;
+            document.getElementById('avg-duration-count').textContent = avgDuration;
+            document.getElementById('avg-rating-count').textContent = avgRating;
+        }
+
+        // Pagination functions for table view
+        function updatePagination() {
+            document.getElementById('current-page').textContent = currentPage;
+        }
+
+        function updatePaginationButtons(totalPrograms) {
+            const totalPages = Math.ceil(totalPrograms / programsPerPage);
+            const prevBtn = document.getElementById('prev-page');
+            const nextBtn = document.getElementById('next-page');
+            
+            prevBtn.disabled = currentPage === 1;
+            nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+        }
+
+        function changePage(direction) {
+            const totalPrograms = filterAndSearchPrograms().length;
+            const totalPages = Math.ceil(totalPrograms / programsPerPage);
+            
+            currentPage += direction;
+            
+            if (currentPage < 1) currentPage = 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+            
+            renderProgramsTable();
+            updatePagination();
+        }
+
+        // Pagination functions for card view
+        function updatePaginationButtonsCards(totalPrograms) {
+            const totalPages = Math.ceil(totalPrograms / cardsPerPage);
+            const prevBtn = document.getElementById('prev-page-cards');
+            const nextBtn = document.getElementById('next-page-cards');
+            
+            prevBtn.disabled = currentPageCards === 1;
+            nextBtn.disabled = currentPageCards === totalPages || totalPages === 0;
+            
+            document.getElementById('current-page-cards').textContent = currentPageCards;
+        }
+
+        function changePageCards(direction) {
+            const totalPrograms = filterAndSearchPrograms().length;
+            const totalPages = Math.ceil(totalPrograms / cardsPerPage);
+            
+            currentPageCards += direction;
+            
+            if (currentPageCards < 1) currentPageCards = 1;
+            if (currentPageCards > totalPages) currentPageCards = totalPages;
+            
+            renderProgramCards();
+        }
+
+        // Show add program modal
+        function showAddProgramModal() {
+            editingProgramId = null;
+            document.getElementById('modal-title').textContent = 'Create New Program';
+            document.getElementById('modal-icon').innerHTML = '<i class="fas fa-project-diagram"></i>';
+            document.getElementById('save-program-btn').textContent = 'Create Program';
+            
+            // Reset form
+            document.getElementById('program-form').reset();
+            
+            // Set default start date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('start-date').value = today;
+            
+            // Set default end date to 3 months from today
+            const threeMonthsLater = new Date();
+            threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+            document.getElementById('end-date').value = threeMonthsLater.toISOString().split('T')[0];
+            
+            document.getElementById('program-modal').classList.add('active');
+        }
+
+        // Edit program
+        function editProgram(programId) {
+            editingProgramId = programId;
+            const program = programsData.find(p => p.id === programId);
+            
+            if (!program) return;
+            
+            document.getElementById('modal-title').textContent = 'Edit Program';
+            document.getElementById('modal-icon').innerHTML = '<i class="fas fa-edit"></i>';
+            document.getElementById('save-program-btn').textContent = 'Update Program';
+            
+            // Fill form with program data
+            document.getElementById('program-name').value = program.name;
+            document.getElementById('category').value = program.category;
+            document.getElementById('description').value = program.description;
+            document.getElementById('duration').value = program.duration;
+            document.getElementById('max-participants').value = program.maxParticipants;
+            document.getElementById('status').value = program.status;
+            document.getElementById('start-date').value = program.startDate || '';
+            document.getElementById('end-date').value = program.endDate || '';
+            document.getElementById('notes').value = program.notes || '';
+            
+            // Handle array fields
+            document.getElementById('objectives').value = program.objectives ? program.objectives.join('\n') : '';
+            document.getElementById('prerequisites').value = program.prerequisites ? program.prerequisites.join('\n') : '';
+            
+            document.getElementById('program-modal').classList.add('active');
+        }
+
+        // Close program modal
+        function closeProgramModal() {
+            document.getElementById('program-modal').classList.remove('active');
+        }
+
+        // Save program (add or update)
+        function saveProgram() {
+            // Validate form
+            const name = document.getElementById('program-name').value.trim();
+            const category = document.getElementById('category').value;
+            const description = document.getElementById('description').value.trim();
+            const duration = parseInt(document.getElementById('duration').value);
+            
+            if (!name || !category || !description || !duration) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+            
+            // Prepare program data
+            const programData = {
+                id: editingProgramId || generateProgramId(),
+                name,
+                category,
+                description,
+                duration,
+                maxParticipants: parseInt(document.getElementById('max-participants').value) || 20,
+                currentParticipants: 0, // Default to 0 for new programs
+                status: document.getElementById('status').value,
+                startDate: document.getElementById('start-date').value || '',
+                endDate: document.getElementById('end-date').value || '',
+                objectives: document.getElementById('objectives').value.split('\n').filter(line => line.trim()),
+                prerequisites: document.getElementById('prerequisites').value.split('\n').filter(line => line.trim()),
+                rating: 0, // Default for new programs
+                totalMentorships: 0, // Default for new programs
+                notes: document.getElementById('notes').value.trim()
+            };
+            
+            // For existing programs, keep some existing data
+            if (editingProgramId) {
+                const existingProgram = programsData.find(p => p.id === editingProgramId);
+                if (existingProgram) {
+                    programData.currentParticipants = existingProgram.currentParticipants;
+                    programData.rating = existingProgram.rating;
+                    programData.totalMentorships = existingProgram.totalMentorships;
+                }
+            }
+            
+            // Add or update program
+            if (editingProgramId) {
+                // Update existing program
+                const index = programsData.findIndex(p => p.id === editingProgramId);
+                if (index !== -1) {
+                    programsData[index] = programData;
+                }
+                showNotification('Program updated successfully!', 'success');
+            } else {
+                // Add new program
+                programsData.unshift(programData);
+                showNotification('Program created successfully!', 'success');
+            }
+            
+            // Close modal and refresh
+            closeProgramModal();
+            renderProgramsTable();
+            renderProgramCards();
+            updateProgramStats();
+        }
+
+        // Generate new program ID
+        function generateProgramId() {
+            return programsData.length > 0 ? Math.max(...programsData.map(p => p.id)) + 1 : 1;
+        }
+
+        // View program details
+        function viewProgramDetails(programId) {
+            const program = programsData.find(p => p.id === programId);
+            
+            if (!program) return;
+            
+            document.getElementById('details-title').textContent = `${program.name} Details`;
+            
+            // Get category display
+            let categoryDisplay = '';
+            if (program.category === 'tech') {
+                categoryDisplay = 'Technology';
+            } else if (program.category === 'leadership') {
+                categoryDisplay = 'Leadership';
+            } else if (program.category === 'career') {
+                categoryDisplay = 'Career Development';
+            } else if (program.category === 'business') {
+                categoryDisplay = 'Business';
+            } else {
+                categoryDisplay = program.category.charAt(0).toUpperCase() + program.category.slice(1);
+            }
+            
+            // Get status display
+            let statusDisplay = program.status.charAt(0).toUpperCase() + program.status.slice(1);
+            
+            // Format dates
+            let dateInfo = 'Not scheduled';
+            if (program.startDate && program.endDate) {
+                const startDate = new Date(program.startDate);
+                const endDate = new Date(program.endDate);
+                const formattedStart = startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                const formattedEnd = endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                dateInfo = `${formattedStart} to ${formattedEnd}`;
+            }
+            
+            // Calculate enrollment percentage
+            const enrollmentPercentage = program.maxParticipants > 0 
+                ? Math.round((program.currentParticipants / program.maxParticipants) * 100) 
+                : 0;
+            
+            // Build program details HTML
+            const detailsHTML = `
+                <div style="margin-bottom: 20px;">
+                    <h3 style="margin-bottom: 10px; color: var(--primary);">${program.name}</h3>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <span class="program-badge" style="background-color: #e8f4fd; color: var(--secondary);">${categoryDisplay}</span>
+                        <span class="status ${program.status === 'active' ? 'active' : program.status === 'inactive' ? 'inactive' : 'draft'}">${statusDisplay}</span>
+                    </div>
+                </div>
+                
+                <div style="background-color: #f9f9f9; padding: 20px; border-radius: var(--radius); margin-bottom: 20px;">
+                    <p><strong>Description:</strong> ${program.description}</p>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                    <div>
+                        <p><strong>Duration:</strong> ${program.duration} months</p>
+                        <p><strong>Schedule:</strong> ${dateInfo}</p>
+                        <p><strong>Rating:</strong> ${program.rating}/5.0</p>
+                    </div>
+                    <div>
+                        <p><strong>Enrollment:</strong> ${program.currentParticipants}/${program.maxParticipants} (${enrollmentPercentage}% full)</p>
+                        <p><strong>Total Mentorships:</strong> ${program.totalMentorships}</p>
+                        <p><strong>Status:</strong> ${statusDisplay}</p>
+                    </div>
+                </div>
+                
+                ${program.objectives && program.objectives.length > 0 ? `
+                <div style="margin-bottom: 15px;">
+                    <h4 style="margin-bottom: 10px;">Learning Objectives</h4>
+                    <ul style="padding-left: 20px;">
+                        ${program.objectives.map(obj => `<li>${obj}</li>`).join('')}
+                    </ul>
+                </div>
+                ` : ''}
+                
+                ${program.prerequisites && program.prerequisites.length > 0 ? `
+                <div style="margin-bottom: 15px;">
+                    <h4 style="margin-bottom: 10px;">Prerequisites</h4>
+                    <ul style="padding-left: 20px;">
+                        ${program.prerequisites.map(pre => `<li>${pre}</li>`).join('')}
+                    </ul>
+                </div>
+                ` : ''}
+                
+                ${program.notes ? `
+                <div style="background-color: #fff9e6; padding: 15px; border-radius: var(--radius);">
+                    <h4 style="margin-bottom: 10px;">Additional Notes</h4>
+                    <p>${program.notes}</p>
+                </div>
+                ` : ''}
+            `;
+            
+            document.getElementById('program-details-content').innerHTML = detailsHTML;
+            document.getElementById('details-modal').classList.add('active');
+        }
+
+        // Close details modal
+        function closeDetailsModal() {
+            document.getElementById('details-modal').classList.remove('active');
+        }
+
+        // Delete program confirmation
+        function deleteProgram(programId) {
+            deletingProgramId = programId;
+            const program = programsData.find(p => p.id === programId);
+            
+            if (!program) return;
+            
+            document.getElementById('delete-message').textContent = 
+                `Are you sure you want to delete "${program.name}"? This action cannot be undone.`;
+            
+            document.getElementById('delete-modal').classList.add('active');
+        }
+
+        // Close delete modal
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.remove('active');
+            deletingProgramId = null;
+        }
+
+        // Confirm delete
+        function confirmDelete() {
+            if (!deletingProgramId) return;
+            
+            // Remove program from data
+            const index = programsData.findIndex(p => p.id === deletingProgramId);
+            if (index !== -1) {
+                programsData.splice(index, 1);
+            }
+            
+            // Close modal and refresh
+            closeDeleteModal();
+            renderProgramsTable();
+            renderProgramCards();
+            updateProgramStats();
+            
+            showNotification('Program deleted successfully!', 'success');
+        }
+
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'notification-item unread';
+            notification.style.position = 'fixed';
+            notification.style.top = '80px';
+            notification.style.right = '30px';
+            notification.style.width = '300px';
+            notification.style.zIndex = '1000';
+            notification.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+            
+            let iconClass = 'info';
+            let icon = 'info-circle';
+            
+            if (type === 'success') {
+                iconClass = 'success';
+                icon = 'check-circle';
+            } else if (type === 'warning') {
+                iconClass = 'warning';
+                icon = 'exclamation-triangle';
+            } else if (type === 'error') {
+                iconClass = 'error';
+                icon = 'times-circle';
+            }
+            
+            notification.innerHTML = `
+                <div class="notification-icon ${iconClass}">
+                    <i class="fas fa-${icon}"></i>
+                </div>
+                <div class="notification-details">
+                    <h4>${type.charAt(0).toUpperCase() + type.slice(1)}</h4>
+                    <p>${message}</p>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                notification.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 500);
+            }, 5000);
+        }
+
+        // Notifications functionality
+        document.getElementById('notifications').addEventListener('click', function(e) {
+            e.stopPropagation();
+            const popup = document.getElementById('notifications-popup');
+            popup.style.display = popup.style.display === 'block' ? 'none' : 'block';
+        });
+
+        function closeNotifications() {
+            document.getElementById('notifications-popup').style.display = 'none';
+        }
+
+        function markAllAsRead() {
+            const unreadItems = document.querySelectorAll('.notification-item.unread');
+            unreadItems.forEach(item => {
+                item.classList.remove('unread');
+            });
+            document.querySelector('.notification-badge').textContent = '0';
+            closeNotifications();
+        }
+
+        // Close notifications when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('#notifications-popup') && !e.target.closest('#notifications')) {
+                closeNotifications();
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            document.getElementById('logout-modal').classList.add('active');
+        });
+
+        document.getElementById('cancel-logout').addEventListener('click', function() {
+            document.getElementById('logout-modal').classList.remove('active');
+        });
+
+        document.getElementById('confirm-logout').addEventListener('click', function() {
+            alert('You have been logged out successfully!');
+            document.getElementById('logout-modal').classList.remove('active');
+        });
+
+        // Initialize program management when page loads
+        document.addEventListener('DOMContentLoaded', initProgramManagement);
+    </script>
+</body>
+</html>
